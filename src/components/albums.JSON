@@ -1,0 +1,30 @@
+{"albums":
+    [
+        {"name":"NOSTALGIA","artist":"Rajiv",
+          "tracks": 
+            [
+              {"name":"NO LIMIT",
+              "artist":"Rajiv",
+              "src": "require('../music/album1/nolimit.mp3')"
+              },
+              {"name":"NOSTALGIA",
+              "artist":"Rajiv",
+              "src": "require('../music/album1/nostalgia.mp3')"
+              }
+            ]
+        },
+        {"name":"Album 2","artist":"Rajiv",
+            "tracks": 
+              [
+                {"name":"GHOST",
+                "artist":"Rajiv",
+                "src": "require('../music/album2/ghost.mp3')"
+                },
+                {"name":"CARTI",
+                "artist":"Rajiv, Playboi Carti",
+                "src": "require('../music/album2/Gameboy beat acapella.mp3')"
+                }
+              ]
+          }
+      ]
+}

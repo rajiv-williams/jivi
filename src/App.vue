@@ -1,6 +1,6 @@
 <template>
   <img alt="Vue logo" src="./assets/logo.png">
-  <AlbumView msg="Welcome to Your Vue.js App"/>
+  <AlbumView/>
 </template>
 
 <script>

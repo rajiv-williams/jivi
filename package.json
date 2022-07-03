@@ -14,6 +14,7 @@
     "fs": "^0.0.1-security",
     "fs-extra": "^10.1.0",
     "fs.promises": "^0.1.2",
+    "get-audio-duration": "^3.1.0",
     "jquery": "^3.6.0",
     "path-browserify": "^1.0.1",
     "require-context": "^1.1.0",
