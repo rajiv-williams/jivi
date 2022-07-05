@@ -1,12 +1,18 @@
 <template>
   <p id="print">
   </p>
+  <button id="leftArrow" class="grid-item">LEFT</button>
+  <button id="rightArrow" class="grid-item">RIGHT</button>
   <div id="album">
-      <img alt="Album Cover" id="albumCover" src="">
-    <table id="albumTracks"></table>
+    <img alt="Album Cover" id="albumCover" class="grid-item" src="">
+    <div id="albumTracks"></div>
   </div>
+  <br>
   <!--PLAY BOX-->
-  <audio id="musicPlayer"></audio>
+  <div id="playBox">
+    <audio id="musicPlayer"></audio>
+  </div>
+  
 </template>
 
 <script>
@@ -17,6 +23,9 @@ export default {
   mounted(){
     
       $(document).ready(function(){
+
+        //INCLUDE IN README, PROGRAM WORKS BEST IN CHROME
+
         //how to change data in JSON FILE
         // fetch('test_data.json')
         // .then((resp) => resp.json())
@@ -36,37 +45,10 @@ export default {
          * value, convert to Object. If that doesn't work idk what will
         */
         
-        var albumList =
-        [
-          {"name":"NOSTALGIA","artist":"Rajiv",
-            "tracks": 
-              [
-                {"name":"NO LIMIT",
-                "artist":"Rajiv",
-                "src": require('../music/album1/nolimit.mp3'),
-                },
-                {"name":"NOSTALGIA",
-                "artist":"Rajiv",
-                "src": require('../music/album1/nostalgia.mp3')
-                }
-              ]
-          },
-          {"name":"Album 2","artist":"Rajiv",
-            "tracks": 
-              [
-                {"name":"GHOST",
-                "artist":"Rajiv",
-                "src": require('../music/album2/ghost.mp3')
-                },
-                {"name":"CARTI",
-                "artist":"Rajiv, Playboi Carti",
-                "src": require('../music/album2/Gameboy beat acapella.mp3')
-                }
-              ]
-          }
-        ];
+        
 
         
+        //console.log(JSON.parse('"require('+ "../music/album1/album1.jpg" + ')"'))
         //albumList[0].tracks[0].src = require(news);
         var allSongs = require.context('../music', true, /\.(mp3)$/).keys();
         var albumCovers = require.context('../music', true, /\.(png|jpg)$/).keys();
@@ -91,13 +73,13 @@ export default {
         var trackLists = getTrackLists(allAlbums,allSongs);
         
         
-        console.log("trackLists: " + trackLists);
+        console.log("trackLists: " + trackLists[1]);
 
 
         /*
           TODO: 
             +Write code to dynamically build table of first album's track list
-            -Make track list playable
+            +Make track list playable
             -Make right and left arrows functional to switch between each album using albumIndex (+/-)
             -Make it so only one album is shown at a time with css
         */
@@ -105,13 +87,36 @@ export default {
         //EVERY TIME AN ALBUM IS SELECTED REPEAT THIS ENTIRE THING BELOW
         //HAVE AN EVENT HANDLER FOR WHEN A NEXT ARROW IS CLICKED
         //REMEMBER WHERE IN THE LIST OF ALBUMS YOU ARE
-        let albumIndex = 0;
-        let currAlbum = $("#albumTracks");
-        let currAlbumCover = $("#albumCover");
-        currAlbumCover.attr("src",require("../music/album1/album1.jpg"));
-        let musicPlayer = document.getElementById("musicPlayer");
-        musicPlayer.controls = true;
+
+        
+        // let test = '../music/album1/album1.jpg'; 
+        currAlbumCover.attr("src",require('../music/album1/album1.jpg'));
+        
+        
         buildAlbum(currAlbum,trackLists,albumIndex);
+
+        $("#leftArrow").click(function(){
+
+          if(albumIndex != 0){
+            // unloadAlbum(trackLists,albumIndex);
+            removeAlbum(currAlbum,trackLists,albumIndex);
+            albumIndex -= 1;
+            buildAlbum(currAlbum,trackLists,albumIndex);
+            
+          }
+          
+        });
+        $("#rightArrow").click(function(){
+
+          if(albumIndex < albumList.length -1){
+            // unloadAlbum(trackLists,albumIndex);
+            removeAlbum(currAlbum,trackLists,albumIndex);
+            albumIndex+=1;
+            buildAlbum(currAlbum,trackLists,albumIndex);
+            
+          }
+          
+        });
         //var cunny = require('../music/album1/./nolimit.mp3');
         //for(i=0; i<trackLists[albumIndex].length;i++){
           //var currTrack = $("tr");
@@ -119,34 +124,10 @@ export default {
           //musicPlayer.src = require(currTrack.attr("src"));
           //console.log(String(currTrack.attr("src")));
           
-          var isShuffle = false;
+          
           
           //change tr to a class maybe idk
-          $(".tracks").click(function(){
-            var trackNum = $(this).attr("id").split("track")[1]
-            var trackList = albumList[albumIndex].tracks;
-            var currTrack = trackList[parseInt(trackNum)-1];
-            musicPlayer.setAttribute("src",currTrack.src);//require(currTrack.attr("src")); 
-            musicPlayer.set
-            musicPlayer.play();
-            document.getElementById("print").innerHTML = currTrack.duration;
-
-            musicPlayer.onended = function(){
-              
-              var queue = getQueue(musicPlayer.getAttribute("src"),trackList,isShuffle);
-              var index = 0;
-              if(index < queue.length){
-                  musicPlayer.src = queue[index];
-                  musicPlayer.play();
-                  index++;
-              }
-              else{
-                  musicPlayer.src = "";
-              }
-              
-                
-            }
-          });
+          $(".tracks").click(playTrack);
         //}
         
         
@@ -154,14 +135,83 @@ export default {
           
 
       });
+      let albumIndex = 0;
+        let currAlbum = $("#albumTracks");
+        let currAlbumCover = $("#albumCover");
+      var isShuffle = false;
+          //let shuffleButton = document.getElementById("shuffleButton")
+          let queue = [];
+      let musicPlayer = document.getElementById("musicPlayer");
+        musicPlayer.controls = true;
 
-      // function unloadAlbum(album,trackLists,albumIndex){
-      //   //remover all id attributes so it is not confused
-      // }
+      
+      var albumList =
+      [
+        {"name":"NOSTALGIA","artist":"Rajiv",
+          "tracks": 
+            [
+              {"name":"NO LIMIT",
+              "artist":"Rajiv",
+              "src": require('../music/album1/nolimit.mp3'),
+              },
+              {"name":"NOSTALGIA",
+              "artist":"Rajiv",
+              "src": require('../music/album1/nostalgia.mp3')
+              }
+            ],
+          "cover": "require('../music/album1/album1.jpg')"
+        },
+        {"name":"Album 2","artist":"Rajiv",
+          "tracks": 
+            [
+              {"name":"CARTI",
+              "artist":"Rajiv, Playboi Carti",
+              "src": require('../music/album2/Gameboy beat acapella.mp3')
+              },
+              {"name":"GHOST",
+              "artist":"Rajiv",
+              "src": require('../music/album2/ghost.mp3')
+              }
+            ]
+        }
+      ];
+
+      function playTrack(){
+        console.log($(this).attr("id"));
+        var trackNum = $(this).attr("id").split("track")[1]
+        var trackList = albumList[albumIndex].tracks;
+        var currTrack = trackList[parseInt(trackNum)-1];
+        musicPlayer.setAttribute("src",currTrack.src);//require(currTrack.attr("src")); 
+        
+        musicPlayer.play();
+        // document.getElementById("print").innerHTML = currTrack.duration;
+
+        musicPlayer.onended = function(){
+          
+          queue = getQueue(musicPlayer.getAttribute("src"),trackList,isShuffle);
+          var index = 0;
+          if(index < queue.length){
+              musicPlayer.src = queue[index];
+              musicPlayer.play();
+              index++;
+          }
+          else{
+              musicPlayer.src = "";
+          }
+          
+            
+        }
+      }
+      function removeAlbum(album,trackLists,albumIndex){
+        for(var i=0; i<trackLists[albumIndex].length; i++){
+            album.children()[0].remove();
+            
+        }
+      }
       
       function buildAlbum(album,trackLists,albumIndex){
         for(var i=0; i<trackLists[albumIndex].length; i++){
-            var tr = $('<tr>');
+            var tr = $('<a>');
             var songPath = trackLists[albumIndex][i];
             //musicPlayer.src = require(songPath);
             // song.controls = true;
@@ -169,14 +219,16 @@ export default {
 
             // var songName = path.parse(songPath).name;
             tr.attr('id', 'track' + (i+1));
+            $("#track"+(i+1)).text("fffsqsah");
             tr.attr("src",songPath);
-            tr.attr("class","tracks")
-            for(var j=0; j<3; j++){
-                var td = $('<td>');
+            tr.attr("class","tracks grid-container")
+            for(var j=0; j<2; j++){
+                var td = $('<b>');
                 if(j==0){
                   //print number of track in album
                   td.text(i+1);
                   td.attr("id","controls"+(i+1));
+                  td.attr("class","trackNumber");
                 }
                 if(j==1){
                   td.text(song.name);
@@ -186,6 +238,7 @@ export default {
             }
             album.append(tr);
         }
+        $(".tracks").click(playTrack);
       }
       function getTrackLists(allAlbums,allSongs){
         var trackLists = [];
@@ -282,18 +335,50 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="css">
-#albumTracks{
+#album{
+  max-width: 400px;
   margin: auto;
+  
   box-shadow: 10px 10px black;
 }
+#albumCover{
+  max-width: 400px;
+  max-height: 400px;
+}
+#albumTracks{
+  width: 400px;
+  
+}
 .tracks{
-    width: 400px;
-    margin: auto;
-    font-size: 50px;
+    max-width: 400px;
+    
+    font-size: 30px;
   
 }
 .tracks:hover{
     opacity: 0.9;
     background-color: rgb(230, 230, 230);
 }
+#playBox{
+  height: 100px;
+
+  background-color: rgb(19, 19, 20);
+}
+#musicPlayer{
+  width: 50%;
+  margin-top: 20px;
+}
+#musicPlayer::-webkit-media-controls-panel {
+  background-color: #bc3131;
+  
+}
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+}
+.trackNumber{
+  text-align: left;
+  margin-left: 20%;
+}
+
 </style>
