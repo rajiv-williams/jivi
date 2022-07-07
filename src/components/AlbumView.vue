@@ -1,16 +1,18 @@
 <template>
   <p id="print">
   </p>
-  <button id="leftArrow" class="grid-item">LEFT</button>
-  <button id="rightArrow" class="grid-item">RIGHT</button>
+  <button id="leftArrow">LEFT</button>
+  <button id="rightArrow">RIGHT</button>
   <div id="album">
     <img alt="Album Cover" id="albumCover" class="grid-item" src="">
     <div id="albumTracks"></div>
   </div>
   <br>
   <!--PLAY BOX-->
-  <div id="playBox">
-    <audio id="musicPlayer"></audio>
+  <div id="playBox" class="grid-container">
+    <button id="loopButton" class="grid-item playerButton">LOOP</button>
+    <audio id="musicPlayer" class="grid-item"></audio>
+    <button id="shuffleButton" class="grid-item playerButton">SHUFFLE</button>
   </div>
   
 </template>
@@ -52,7 +54,7 @@ export default {
         //albumList[0].tracks[0].src = require(news);
         var allSongs = require.context('../music', true, /\.(mp3)$/).keys();
         var albumCovers = require.context('../music', true, /\.(png|jpg)$/).keys();
-        console.log(path.parse(allSongs[0]));
+        // console.log(path.parse(allSongs[0]));
         console.log(albumCovers);
 
         //Getting the list of albums
@@ -124,7 +126,18 @@ export default {
           //musicPlayer.src = require(currTrack.attr("src"));
           //console.log(String(currTrack.attr("src")));
           
+        $("#shuffleButton").click(function(){
+          var shuffleButton = $(this);
+          if(isShuffle){
+            isShuffle = false;
+            shuffleButton.text("NO SHUFFLE");
+          }
+          else{
+            isShuffle = true;
+            shuffleButton.text("SHUFFLE");
+          }
           
+        });  
           
           //change tr to a class maybe idk
           $(".tracks").click(playTrack);
@@ -136,13 +149,13 @@ export default {
 
       });
       let albumIndex = 0;
-        let currAlbum = $("#albumTracks");
-        let currAlbumCover = $("#albumCover");
-      var isShuffle = false;
-          //let shuffleButton = document.getElementById("shuffleButton")
-          let queue = [];
+      let currAlbum = $("#albumTracks");
+      let currAlbumCover = $("#albumCover");
+      var isShuffle = true;
+      // let shuffleButton = document.getElementById("shuffleButton")
+      let queue = [];
       let musicPlayer = document.getElementById("musicPlayer");
-        musicPlayer.controls = true;
+      musicPlayer.controls = true;
 
       
       var albumList =
@@ -177,26 +190,33 @@ export default {
       ];
 
       function playTrack(){
-        console.log($(this).attr("id"));
-        var trackNum = $(this).attr("id").split("track")[1]
+        // console.log($(this).attr("id"));
+        var defaultClass = "tracks grid-container";
+        $(".playing").attr("class",defaultClass );
+        var currTrack = $(this);
+        var trackNum = currTrack.attr("id").split("track")[1]
         var trackList = albumList[albumIndex].tracks;
-        var currTrack = trackList[parseInt(trackNum)-1];
-        musicPlayer.setAttribute("src",currTrack.src);//require(currTrack.attr("src")); 
         
+        musicPlayer.src = trackList[parseInt(trackNum)-1].src;//require(currTrack.attr("src")); 
+        currTrack.attr("class","playing "+ defaultClass);
         musicPlayer.play();
         // document.getElementById("print").innerHTML = currTrack.duration;
-
+        var index = 0;
         musicPlayer.onended = function(){
           
           queue = getQueue(musicPlayer.getAttribute("src"),trackList,isShuffle);
-          var index = 0;
+          console.log("queue: " + queue)
+          
           if(index < queue.length){
-              musicPlayer.src = queue[index];
+              $(".playing").attr("class",defaultClass);
+              musicPlayer.src = queue[index][0];
               musicPlayer.play();
+              $("#track"+queue[index][1]).attr("class","playing " + defaultClass);
               index++;
           }
           else{
               musicPlayer.src = "";
+              $(".playing").attr("class",defaultClass );
           }
           
             
@@ -275,20 +295,20 @@ export default {
         its album (trackList) and whether shuffle is on or not
       */
       function getQueue(currTrackPath,trackList,isShuffle){    
-
+          var queue = [];
           //when shuffle is off
           if(!isShuffle){
               var audioFound = false;
-              var queue = [];
+              
               for(var i = 0; i < trackList.length; i++){
                   if(trackList[i].src.match(currTrackPath) && !audioFound){
                       audioFound = true;
-                      console.log("ffffff");
+                      // console.log("ffffff");
                       continue;
                   }
                   if(audioFound){
                       //create a queue in chronological order
-                      queue[queue.length] = trackList[i].src;
+                      queue[queue.length] = [trackList[i].src,i+1];
                   }
               }
               return queue;
@@ -296,36 +316,29 @@ export default {
 
           //when shuffle is on
           if(isShuffle){
-              var ignoredIndex = 0;
-              queue = [];
+              var ignoredIndexes = [];
               for(i = 0; i < trackList.length; i++){
+                  //Initially clicked on song is ignored in the queue
                   if(trackList[i].src.match(currTrackPath)){
-                      ignoredIndex = i;
+                      console.log(i)
+                      ignoredIndexes.push(i);
                       break;
                   }
               }
               
               //queue ignores the current track
               while(queue.length < trackList.length - 1){
-                  var randSongIndex = -1;
+                  var randSongIndex = Math.floor(Math.random() * trackList.length);
 
-                  //case where the first song in the album is the current track (not included in queue)
-                  if(ignoredIndex == 0){
-                      randSongIndex = Math.floor(Math.random() * trackList.length + 1);
-                  }
-                  //cases where the first song is included in the queue
-                  else{
-                      randSongIndex = Math.floor(Math.random() * trackList.length);
-                  }
-                  if(queue.indexOf(randSongIndex) === -1){
+                  //makes sure each song in the queue is unique
+                  if(queue.indexOf(randSongIndex) == -1 && !ignoredIndexes.includes(randSongIndex)){
                       //add random song from trackList to the queue
-                      queue.push(trackList[randSongIndex].src);
+                      queue.push([trackList[randSongIndex].src,randSongIndex+1]);
+                      ignoredIndexes.push(randSongIndex);
                   }
               }  
               return queue;  
           }
-
-          
           
       }
 
@@ -359,13 +372,17 @@ export default {
     opacity: 0.9;
     background-color: rgb(230, 230, 230);
 }
+.playing{
+    opacity: 0.9;
+    background-color: rgb(195, 242, 174);
+}
 #playBox{
   height: 100px;
 
   background-color: rgb(19, 19, 20);
 }
 #musicPlayer{
-  width: 50%;
+  width: 100%;
   margin-top: 20px;
 }
 #musicPlayer::-webkit-media-controls-panel {
@@ -381,4 +398,9 @@ export default {
   margin-left: 20%;
 }
 
+.playerButton{
+  max-width: 50%;
+  max-height: 50%;
+  margin: auto;
+}
 </style>
