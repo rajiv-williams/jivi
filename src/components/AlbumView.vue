@@ -1,24 +1,32 @@
 <template>
-  <p id="print">
-  </p>
-  <button id="leftArrow">LEFT</button>
-  <button id="rightArrow">RIGHT</button>
-  <div id="album">
-    <img alt="Album Cover" id="albumCover" class="grid-item" src="">
-    <div id="albumTracks"></div>
-  </div>
-  <br>
-  <!--PLAY BOX-->
-  <div id="playBox" class="grid-container">
-    <button id="loopButton" class="grid-item playerButton">LOOP</button>
-    <audio id="musicPlayer" class="grid-item"></audio>
-    <button id="shuffleButton" class="grid-item playerButton">SHUFFLE</button>
+  
+  <div id="background">
+    <div id="albumNavigation">
+      <a id="leftArrow" class="navigation"></a>
+      
+      <div id="album">
+        <img alt="Album Cover" id="albumCover" class="grid-item" src="">
+        <div id="albumTracks"></div>
+      </div>
+
+      <a id="rightArrow" class="navigation"></a>
+    </div>
+    <br>
+    <!--PLAY BOX-->
+    <div id="playBox">
+      <img id="displayAlbum" alt="Album Cover" src="../assets/Black_Box.png" class="grid-item">  
+      <a id="songPlaying" class="grid-item"></a>
+      <audio id="musicPlayer" class="grid-item"></audio>
+      <button id="nextButton">NEXT</button>
+      <button id="shuffleButton" class="grid-item playerButton">SHUFFLE ON</button>
+    </div>
   </div>
   
 </template>
 
 <script>
 import $ from 'jquery';
+import albumList from '../scripts/data.js'
 import path from 'path-browserify';
 export default {
   name: 'AlbumView',
@@ -72,7 +80,7 @@ export default {
         console.log("allAlbums: " + allAlbums);
 
         //Getting the track lists for each album
-        var trackLists = getTrackLists(allAlbums,allSongs);
+        var trackLists = getTrackLists();
         
         
         console.log("trackLists: " + trackLists[1]);
@@ -82,8 +90,8 @@ export default {
           TODO: 
             +Write code to dynamically build table of first album's track list
             +Make track list playable
-            -Make right and left arrows functional to switch between each album using albumIndex (+/-)
-            -Make it so only one album is shown at a time with css
+            +Make right and left arrows functional to switch between each album using albumIndex (+/-)
+            +Make it so only one album is shown at a time with css
         */
 
         //EVERY TIME AN ALBUM IS SELECTED REPEAT THIS ENTIRE THING BELOW
@@ -92,7 +100,7 @@ export default {
 
         
         // let test = '../music/album1/album1.jpg'; 
-        currAlbumCover.attr("src",require('../music/album1/album1.jpg'));
+        currAlbumCover.attr("src",albumList[albumIndex].cover);
         
         
         buildAlbum(currAlbum,trackLists,albumIndex);
@@ -104,7 +112,7 @@ export default {
             removeAlbum(currAlbum,trackLists,albumIndex);
             albumIndex -= 1;
             buildAlbum(currAlbum,trackLists,albumIndex);
-            
+            currAlbumCover.attr("src",albumList[albumIndex].cover);
           }
           
         });
@@ -115,7 +123,7 @@ export default {
             removeAlbum(currAlbum,trackLists,albumIndex);
             albumIndex+=1;
             buildAlbum(currAlbum,trackLists,albumIndex);
-            
+            currAlbumCover.attr("src",albumList[albumIndex].cover);
           }
           
         });
@@ -130,17 +138,17 @@ export default {
           var shuffleButton = $(this);
           if(isShuffle){
             isShuffle = false;
-            shuffleButton.text("NO SHUFFLE");
+            shuffleButton.text("SHUFFLE OFF");
           }
           else{
             isShuffle = true;
-            shuffleButton.text("SHUFFLE");
+            shuffleButton.text("SHUFFLE ON");
           }
           
         });  
           
           //change tr to a class maybe idk
-          $(".tracks").click(playTrack);
+          // $(".tracks").click(playTrack);
         //}
         
         
@@ -149,78 +157,77 @@ export default {
 
       });
       let albumIndex = 0;
+      
       let currAlbum = $("#albumTracks");
       let currAlbumCover = $("#albumCover");
       var isShuffle = true;
       // let shuffleButton = document.getElementById("shuffleButton")
       let queue = [];
+      let queueIndex = 0;
       let musicPlayer = document.getElementById("musicPlayer");
+      let trackNum = 0;
+      let defaultClass = "tracks grid-container";
       musicPlayer.controls = true;
 
       
-      var albumList =
-      [
-        {"name":"NOSTALGIA","artist":"Rajiv",
-          "tracks": 
-            [
-              {"name":"NO LIMIT",
-              "artist":"Rajiv",
-              "src": require('../music/album1/nolimit.mp3'),
-              },
-              {"name":"NOSTALGIA",
-              "artist":"Rajiv",
-              "src": require('../music/album1/nostalgia.mp3')
-              }
-            ],
-          "cover": "require('../music/album1/album1.jpg')"
-        },
-        {"name":"Album 2","artist":"Rajiv",
-          "tracks": 
-            [
-              {"name":"CARTI",
-              "artist":"Rajiv, Playboi Carti",
-              "src": require('../music/album2/Gameboy beat acapella.mp3')
-              },
-              {"name":"GHOST",
-              "artist":"Rajiv",
-              "src": require('../music/album2/ghost.mp3')
-              }
-            ]
-        }
-      ];
+      
 
       function playTrack(){
-        // console.log($(this).attr("id"));
-        var defaultClass = "tracks grid-container";
-        $(".playing").attr("class",defaultClass );
-        var currTrack = $(this);
-        var trackNum = currTrack.attr("id").split("track")[1]
-        var trackList = albumList[albumIndex].tracks;
         
-        musicPlayer.src = trackList[parseInt(trackNum)-1].src;//require(currTrack.attr("src")); 
-        currTrack.attr("class","playing "+ defaultClass);
-        musicPlayer.play();
-        // document.getElementById("print").innerHTML = currTrack.duration;
-        var index = 0;
-        musicPlayer.onended = function(){
+          $(".trackNumber").attr("class","trackNumber play");
+          // console.log($(this).attr("id"));
+          defaultClass = "tracks grid-container";
+          $(".playing").attr("class",defaultClass );
+          var currTrack = $(this);
+          trackNum = currTrack.attr("id").split("track")[1]
+          var trackList = albumList[albumIndex].tracks;
           
+          musicPlayer.src = trackList[parseInt(trackNum)-1].src;//require(currTrack.attr("src")); 
+          currTrack.attr("class","playing "+ defaultClass);
+
+          musicPlayer.play();
+          $("#songPlaying").text($("#track"+trackNum).attr("display"));
+          $("#displayAlbum").attr("src",albumList[albumIndex].cover);
+          //Display pause button whenever track Number is hovered over
+          $("#controls"+trackNum).attr("class","trackNumber pause");
+          // document.getElementById("print").innerHTML = currTrack.duration;
+          queueIndex = 0;
           queue = getQueue(musicPlayer.getAttribute("src"),trackList,isShuffle);
-          console.log("queue: " + queue)
+
+          // $("#nextButton").click(playNext);
+
+          musicPlayer.onended = playNext;
+        
+      }
+      function playNext(){
+
+          //Display play button whenever track number is hovered over
+          $("#controls"+trackNum).attr("class","trackNumber play");
           
-          if(index < queue.length){
+          //console.log("queue: " + queue)
+          
+          if(queueIndex < queue.length){
               $(".playing").attr("class",defaultClass);
-              musicPlayer.src = queue[index][0];
+              musicPlayer.src = queue[queueIndex][0];
+              trackNum = queue[queueIndex][1];
               musicPlayer.play();
-              $("#track"+queue[index][1]).attr("class","playing " + defaultClass);
-              index++;
+              $("#track"+trackNum).attr("class","playing " + defaultClass);
+
+              //Display pause button whenever track Number is hovered over
+              $("#controls"+trackNum).attr("class","trackNumber pause");
+              $("#songPlaying").text($("#track"+trackNum).attr("display"));
+              queueIndex++;
           }
           else{
               musicPlayer.src = "";
               $(".playing").attr("class",defaultClass );
+              $("#songPlaying").text("");
+              $("#displayAlbum").attr("src",require("../assets/Black_Box.png"));
+              queueIndex = 0;
           }
           
             
-        }
+        
       }
       function removeAlbum(album,trackLists,albumIndex){
         for(var i=0; i<trackLists[albumIndex].length; i++){
@@ -230,51 +237,69 @@ export default {
       }
       
       function buildAlbum(album,trackLists,albumIndex){
+        
         for(var i=0; i<trackLists[albumIndex].length; i++){
             var tr = $('<a>');
-            var songPath = trackLists[albumIndex][i];
-            //musicPlayer.src = require(songPath);
-            // song.controls = true;
-            var song = path.parse(songPath);
+            var song = trackLists[albumIndex][i];
+            
 
             // var songName = path.parse(songPath).name;
             tr.attr('id', 'track' + (i+1));
-            $("#track"+(i+1)).text("fffsqsah");
-            tr.attr("src",songPath);
-            tr.attr("class","tracks grid-container")
+            tr.attr("src",song.src);
+            tr.attr("display", song.name + " - " + song.artist);
+            tr.attr("class","tracks grid-container");
+            tr.click(playTrack);
+            
             for(var j=0; j<2; j++){
                 var td = $('<b>');
                 if(j==0){
                   //print number of track in album
                   td.text(i+1);
                   td.attr("id","controls"+(i+1));
-                  td.attr("class","trackNumber");
+                  td.attr("class","trackNumber play");
                 }
                 if(j==1){
                   td.text(song.name);
+                  td.attr("class","songTitle");
                 }
                 tr.append(td);
                 
             }
             album.append(tr);
         }
-        $(".tracks").click(playTrack);
       }
-      function getTrackLists(allAlbums,allSongs){
+      function getTrackLists(){
         var trackLists = [];
-        for(var i=0;i<allAlbums.length;i++){
-          var tracks = [];
+        // for(var i=0;i<allAlbums.length;i++){
+        //   var tracks = [];
 
-          for(var j=0;j<allSongs.length;j++){
-            var song = path.parse(allSongs[j]);
-            //console.log(song.dir + " vs " + allAlbums[i]);
-            if(song.dir == allAlbums[i]){
+        //   for(var j=0;j<allSongs.length;j++){
+        //     var song = path.parse(allSongs[j]);
+        //     //console.log(song.dir + " vs " + allAlbums[i]);
+        //     if(song.dir == allAlbums[i]){
               
-              // console.log("i:"+i+" j:"+j);
-              tracks[tracks.length] = "../music/" + song.dir + "/" + song.base;
-              // tracks[tracks.length] = require("../music/album1/nolimit.mp3");
-              trackLists[i] = tracks;
-            }
+        //       // console.log("i:"+i+" j:"+j);
+        //       tracks[tracks.length] = "../music/" + song.dir + "/" + song.base;
+        //       // tracks[tracks.length] = require("../music/album1/nolimit.mp3");
+        //       trackLists[i] = tracks;
+        //     }
+        //   }
+        // }
+        for(var i=0;i<albumList.length;i++){
+          var tracks = [];
+          var album = albumList[i].tracks;
+          for(var j=0;j<album.length;j++){
+            var song = album[j];
+            //console.log(song.dir + " vs " + allAlbums[i]);
+            // if(song.dir == allAlbums[i]){
+              
+            //   // console.log("i:"+i+" j:"+j);
+            //   tracks[tracks.length] = "../music/" + song.dir + "/" + song.base;
+            //   // tracks[tracks.length] = require("../music/album1/nolimit.mp3");
+            //   trackLists[i] = tracks;
+            // }
+            tracks[tracks.length] = song;
+            trackLists[i] = tracks;
           }
         }
 
@@ -348,23 +373,58 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="css">
+body{
+  background-image: url("../assets/background.jpg");
+}
 #album{
   max-width: 400px;
   margin: auto;
-  
+  border:  1px solid black;
+  border-collapse: collapse;
   box-shadow: 10px 10px black;
 }
 #albumCover{
-  max-width: 400px;
-  max-height: 400px;
+  max-width: 350px;
+  max-height: 350px;
+}
+#displayAlbum{
+  max-width: 80px;
+  max-height: 80px;
+  margin: auto;
+}
+#songPlaying{
+  width: 150px;
 }
 #albumTracks{
-  width: 400px;
-  
+  width: 350px;
+  height: 100%;
+}
+.navigation{
+  margin-top: 200px;
+}
+#leftArrow{
+  width: 0;
+	height: 0;
+	border-top: 35px solid transparent;
+	border-right: 50px solid rgb(11, 11, 11);
+	border-bottom: 35px solid transparent;
+}
+#leftArrow:hover{
+  border-right: 50px solid rgb(147, 147, 147); 
+}
+#rightArrow{
+  width: 0;
+	height: 0;
+	border-top: 35px solid transparent;
+	border-left: 50px solid rgb(11, 11, 11);
+	border-bottom: 35px solid transparent;
+}
+#rightArrow:hover{
+  border-left: 50px solid rgb(100, 100, 100); 
 }
 .tracks{
     max-width: 400px;
-    
+    background-color: white;
     font-size: 30px;
   
 }
@@ -379,15 +439,23 @@ export default {
 #playBox{
   height: 100px;
 
-  background-color: rgb(19, 19, 20);
+  background-color: black;
+  display: grid;
+  grid-template-columns: 10% 15% auto 8% 17%;
 }
 #musicPlayer{
   width: 100%;
   margin-top: 20px;
 }
 #musicPlayer::-webkit-media-controls-panel {
-  background-color: #bc3131;
+  background-color: #e3e3e3;
   
+}
+#albumNavigation{
+  max-width: 50%;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 10% auto 10%;
 }
 .grid-container {
   display: grid;
@@ -395,12 +463,48 @@ export default {
 }
 .trackNumber{
   text-align: left;
-  margin-left: 20%;
+  margin-left: 10px;
 }
-
+.trackNumber:hover.play{
+  text-indent: -9999px;
+  width: 0;
+	height: 0;
+	border-top: 15px solid transparent;
+	border-left: 25px solid rgb(11, 11, 11);
+	border-bottom: 15px solid transparent;
+  white-space: nowrap;
+}
+.trackNumber:hover.pause{
+  text-indent: -9999px;
+  width: 0px;
+	height: 30px;
+  border-style: double;
+  border-width: 0px 0px 0px 25px;
+  border-color: solid rgb(11, 11, 11);
+  white-space: nowrap;
+}
+/* .songTitle{
+   text-align: justify;
+} */
+.grid-item{
+  margin:auto;
+}
 .playerButton{
   max-width: 50%;
   max-height: 50%;
   margin: auto;
 }
+#nextButton{
+  margin: auto;
+}
+
+body, html {
+  height: 60%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+
 </style>
