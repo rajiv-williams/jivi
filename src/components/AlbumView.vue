@@ -1,11 +1,13 @@
 <template>
   
   <div id="background">
+    <h1 class="albumTitle">ALBUM TITLE</h1>
     <div id="albumNavigation">
       <a id="leftArrow" class="navigation"></a>
       
+      
       <div id="album">
-        <img alt="Album Cover" id="albumCover" class="grid-item" src="">
+        <img alt="Album Cover" id="albumCover" src="">
         <div id="albumTracks"></div>
       </div>
 
@@ -113,6 +115,7 @@ export default {
             albumIndex -= 1;
             buildAlbum(currAlbum,trackLists,albumIndex);
             currAlbumCover.attr("src",albumList[albumIndex].cover);
+            albumTitle.text(albumList[albumIndex].name);
           }
           
         });
@@ -124,6 +127,7 @@ export default {
             albumIndex+=1;
             buildAlbum(currAlbum,trackLists,albumIndex);
             currAlbumCover.attr("src",albumList[albumIndex].cover);
+            albumTitle.text(albumList[albumIndex].name);
           }
           
         });
@@ -160,6 +164,8 @@ export default {
       
       let currAlbum = $("#albumTracks");
       let currAlbumCover = $("#albumCover");
+      let albumTitle = $(".albumTitle");
+      albumTitle.text(albumList[albumIndex].name);
       var isShuffle = true;
       // let shuffleButton = document.getElementById("shuffleButton")
       let queue = [];
@@ -394,6 +400,7 @@ body{
 }
 #songPlaying{
   width: 150px;
+  color: rgb(225, 225, 225);
 }
 #albumTracks{
   width: 350px;
@@ -412,6 +419,7 @@ body{
 #leftArrow:hover{
   border-right: 50px solid rgb(147, 147, 147); 
 }
+
 #rightArrow{
   width: 0;
 	height: 0;
@@ -499,12 +507,11 @@ body{
 }
 
 body, html {
-  height: 60%;
+  height: 10%;
 }
 
 * {
   box-sizing: border-box;
 }
-
 
 </style>
