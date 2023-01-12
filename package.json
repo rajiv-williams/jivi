@@ -11,6 +11,7 @@
     "browserify": "^17.0.0",
     "browserify-fs": "^1.0.0",
     "core-js": "^3.8.3",
+    "firebase": "^9.15.0",
     "fs": "^0.0.1-security",
     "fs-extra": "^10.1.0",
     "fs.promises": "^0.1.2",
