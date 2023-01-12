@@ -5,7 +5,7 @@
       
       <div id="album">
         <img alt="Album Cover" id="albumCover" src="">
-        <div id="albumTracks"></div>
+        <div id="albumTrackContainer"></div>
       </div>
 
       <a id="rightArrow" class="navigation"></a>
@@ -31,7 +31,7 @@ export default {
   max-width: 100%;
   max-height: 100%;
 }
-#albumTracks{
+#albumTrackContainer{
   overflow-y: scroll;
   width: 100%;
   height: 70px;

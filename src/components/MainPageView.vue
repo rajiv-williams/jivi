@@ -25,8 +25,7 @@ export default {
   mounted(){
       
       let albumList = ["NOSTALGIA","RESET"];
-      
-      let currAlbum = $("#albumTracks");
+      let trackContainer = $("#albumTrackContainer");
       let currAlbumCover = $("#albumCover");
       let currTrackList = [];
 
@@ -66,7 +65,7 @@ export default {
         $("#leftArrow").click(function(){
 
           if(albumIndex != 0){
-            resetAlbum(currAlbum)
+            resetAlbum();
             albumIndex -= 1;
             albumTitle.text(albumList[albumIndex]);
             buildTrackList(albumTitle.text());
@@ -76,7 +75,7 @@ export default {
         $("#rightArrow").click(function(){
 
           if(albumIndex < albumList.length -1){
-            resetAlbum(currAlbum)
+            resetAlbum()
             albumIndex+=1;
             albumTitle.text(albumList[albumIndex]);
             buildTrackList(albumTitle.text());
@@ -103,6 +102,7 @@ export default {
       
       //https://firebase.google.com/docs/storage/web/list-files
       async function buildTrackList(albumDirectory){
+        // SHOW CIRCULAR PROGRESS INDICATOR
         currTrackList = [];
         //var albumCover;
         const listRef = ref(storage, albumDirectory);
@@ -122,14 +122,16 @@ export default {
                   }
                   else{
                     currAlbumCover.attr("src",url);
-                    $("#displayAlbum").attr("src",url);
+                    //$("#displayAlbum").attr("src",url);
                   }
                   
                   
                   if(res.items.length > 0 && res.items.length - 1 == index){
                     console.log("SONGS MainPage: "+currTrackList);
-                    buildAlbum(currAlbum);
-                    
+
+                    // HIDE CIRCULAR PROGRESS INDICATOR
+
+                    buildAlbum(trackContainer);
                     console.log(url);
                   }
                   index += 1;
@@ -163,7 +165,8 @@ export default {
 
           musicPlayer.play();
           $("#songPlaying").text($("#track"+trackNum).attr("display"));
-    
+          $("#displayAlbum").attr("src",currAlbumCover.attr("src"));
+          
           //Display pause button whenever track Number is hovered over
           //$("#controls"+trackNum).attr("class","trackNumber play");
           $("#controls"+trackNum).attr("class","trackNumber");
@@ -193,6 +196,7 @@ export default {
               //Display pause button whenever track Number is hovered over
               $("#controls"+trackNum).attr("class","trackNumber pause");
               $("#songPlaying").text($("#track"+trackNum).attr("display"));
+              $("#displayAlbum").attr("src",currAlbumCover.attr("src"));
               queueIndex++;
           }
           else{
@@ -202,14 +206,13 @@ export default {
               $("#displayAlbum").attr("src",require("../assets/Black_Box.png"));
               queueIndex = 0;
           }
-          
-            
         
       }
 
-      function resetAlbum(album){
+      function resetAlbum(){
+        document.getElementById("album").style.visibility = "hidden";
         for(var i=0; i<currTrackList.length; i++){
-            album.children()[0].remove();        
+            trackContainer.children()[0].remove();        
         }
       }
 
@@ -244,8 +247,9 @@ export default {
             }
             album.append(tr);
         }
+
+        document.getElementById("album").style.visibility = "visible";
       }
-      
      
       /*
         Returns a queue based on the current track, 
