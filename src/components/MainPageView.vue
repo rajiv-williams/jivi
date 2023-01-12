@@ -9,12 +9,10 @@
     <button id="addButton" @click="upload">ADD</button> -->
   </div>
   
-  
 </template>
 
 <script>
 import $ from 'jquery';
-import albumList from '../scripts/data.js'
 import PlayBoxView from '@/components/PlayBoxView.vue';
 import AlbumView from '@/components/AlbumView.vue'
 import { storage } from "@/firebase/firebase"
@@ -26,6 +24,7 @@ export default {
   components: {PlayBoxView,AlbumView},
   mounted(){
       
+      let albumList = ["NOSTALGIA","RESET"];
       
       let currAlbum = $("#albumTracks");
       let currAlbumCover = $("#albumCover");
@@ -33,7 +32,7 @@ export default {
 
       let albumIndex = 0;
       let albumTitle = $(".albumTitle");
-      albumTitle.text(albumList[albumIndex].name);
+      albumTitle.text(albumList[0]);
       var isShuffle = true;
       // let shuffleButton = document.getElementById("shuffleButton")
       let queue = [];
@@ -43,7 +42,7 @@ export default {
       let defaultClass = "tracks grid-container";
       musicPlayer.controls = true;
       
-      let listOfAlbums = ["NOSTALGIA","RESET"];
+      
       
       $(document).ready(async function(){
 
@@ -69,17 +68,17 @@ export default {
           if(albumIndex != 0){
             resetAlbum(currAlbum)
             albumIndex -= 1;
-            albumTitle.text(listOfAlbums[albumIndex]);
+            albumTitle.text(albumList[albumIndex]);
             buildTrackList(albumTitle.text());
           }
           
         });
         $("#rightArrow").click(function(){
 
-          if(albumIndex < listOfAlbums.length -1){
+          if(albumIndex < albumList.length -1){
             resetAlbum(currAlbum)
             albumIndex+=1;
-            albumTitle.text(listOfAlbums[albumIndex]);
+            albumTitle.text(albumList[albumIndex]);
             buildTrackList(albumTitle.text());
           }
           
@@ -157,7 +156,6 @@ export default {
           $(".playing").attr("class",defaultClass );
           var currTrack = $(this);
           trackNum = currTrack.attr("id").split("track")[1]
-          //var trackList = albumList[albumIndex].tracks;
           
           //musicPlayer.src = trackList[parseInt(trackNum)-1].src;//require(currTrack.attr("src")); 
           musicPlayer.src = currTrackList[parseInt(trackNum)-1].src;
