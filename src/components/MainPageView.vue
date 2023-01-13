@@ -280,6 +280,7 @@ export default {
         for(var i=0; i<currTrackList.length; i++){
             trackContainer.children()[0].remove();        
         }
+        queue = [];
       }
 
       function buildAlbum(album){
