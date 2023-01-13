@@ -100,8 +100,8 @@ export default {
 
         
 
-        $("#nextButton").click(playNext);      
-        $("#prevButton").click(playPrev);      
+        $("#nextButton").click(playNextOrPrev);      
+        $("#prevButton").click(playNextOrPrev);      
 
       });
 
@@ -206,18 +206,24 @@ export default {
           console.log("SHUFFLE: "+ isShuffle)
           console.log("QUEUE: "+queue[0].trackName + ",,,,,,," +queue[1].trackName)
 
-          musicPlayer.onended = playNext;
+          musicPlayer.onended = playNextOrPrev;
         
       }
      
-      function playNext(){
+      function playNextOrPrev(){
 
           //Display play button whenever track number is hovered over
           $("#controls"+trackNum).attr("class","trackNumber play");
           
-          queueIndex ++;
+          if($(this).attr("id").match("prev")){
+            queueIndex--;
+          }
+          else{
+            queueIndex++;
+          }
           
-          if(queueIndex < queue.length){
+          // if queueIndex is within range of the queue
+          if(queueIndex < queue.length && queueIndex >= 0){
               $(".playing").attr("class",defaultClass);
               musicPlayer.src = queue[queueIndex].src;
               trackNum = queue[queueIndex].trackNumber;
@@ -236,34 +242,36 @@ export default {
               //$("#displayAlbum").attr("src",require("../assets/Black_Box.png"));
               document.getElementById("displayAlbum").style.visibility = "hidden";
               queueIndex = 0;
+              queue = [];
           }
         
       }
-      function playPrev(){          
-          queueIndex--;
-          if(queueIndex >= 0){
-              $(".playing").attr("class",defaultClass);
-              musicPlayer.src = queue[queueIndex].src;
-              trackNum = queue[queueIndex].trackNumber;
-              musicPlayer.play();
+      // function playPrev(){          
+      //     queueIndex--;
+      //     if(queueIndex >= 0){
+      //         $(".playing").attr("class",defaultClass);
+      //         musicPlayer.src = queue[queueIndex].src;
+      //         trackNum = queue[queueIndex].trackNumber;
+      //         musicPlayer.play();
 
-              $("#track"+trackNum).attr("class","playing " + defaultClass);
+      //         $("#track"+trackNum).attr("class","playing " + defaultClass);
 
-              //Display pause button whenever track Number is hovered over
-              $("#controls"+trackNum).attr("class","trackNumber pause");
-              $("#songPlaying").text($("#track"+trackNum).attr("display"));
-              $("#displayAlbum").attr("src",currAlbumCover.attr("src"));
-          }
-          else{
-              musicPlayer.src = "";
-              $(".playing").attr("class",defaultClass );
-              $("#songPlaying").text("");
-              //$("#displayAlbum").attr("src",require("../assets/Black_Box.png"));
-              document.getElementById("displayAlbum").style.visibility = "hidden";
-              queueIndex = 0;
-          }
+      //         //Display pause button whenever track Number is hovered over
+      //         $("#controls"+trackNum).attr("class","trackNumber pause");
+      //         $("#songPlaying").text($("#track"+trackNum).attr("display"));
+      //         $("#displayAlbum").attr("src",currAlbumCover.attr("src"));
+      //     }
+      //     else{
+      //         musicPlayer.src = "";
+      //         $(".playing").attr("class",defaultClass );
+      //         $("#songPlaying").text("");
+      //         //$("#displayAlbum").attr("src",require("../assets/Black_Box.png"));
+      //         document.getElementById("displayAlbum").style.visibility = "hidden";
+      //         queueIndex = 0;
+      //         queue = [];
+      //     }
         
-      }
+      // }
 
       function resetAlbum(){
         document.getElementById("albumContainer").style.display = "none";
@@ -350,7 +358,7 @@ export default {
               }
               
           
-              while(queue.length <= currTrackList.length - 1){
+              while(queue.length <= currTrackList.length -1){
                   var randSongIndex = Math.floor(Math.random() * currTrackList.length);
 
                   //makes sure each song in the queue is unique
