@@ -1,11 +1,13 @@
 <template>
     <!--PLAY BOX-->
     <div id="playBox">
-      <img id="displayAlbum" alt="Album Cover" src="../assets/Black_Box.png" class="grid-item">  
+      <img id="displayAlbum" alt="Album Cover" src="" class="grid-item">  
       <a id="songPlaying" class="grid-item"></a>
+      
+      <button id="prevButton">PREV</button>
       <audio id="musicPlayer" class="grid-item"></audio>
       <button id="nextButton">NEXT</button>
-      <button id="shuffleButton" class="grid-item playerButton">SHUFFLE ON</button>
+      <button id="shuffleButton" class="grid-item playerButton">SHUFFLE OFF</button>
     </div>
   
 </template>
@@ -24,6 +26,7 @@ export default {
   max-width: 80px;
   max-height: 80px;
   margin: auto;
+  visibility: hidden;
 }
 #songPlaying{
   width: 150px;
@@ -36,10 +39,13 @@ export default {
 }
 #playBox{
   height: 100px;
-
+  position: absolute;
+  bottom: 0%;
+  width: 99%;
+  margin: auto;
   background-color: black;
   display: grid;
-  grid-template-columns: 10% 15% auto 8% 17%;
+  grid-template-columns: 10% 10% 8% auto 8% 17%;
 }
 #musicPlayer{
   width: 100%;
@@ -58,6 +64,9 @@ export default {
   margin: auto;
 }
 #nextButton{
+  margin: auto;
+}
+#prevButton{
   margin: auto;
 }
 </style>
