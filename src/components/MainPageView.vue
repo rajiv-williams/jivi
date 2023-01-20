@@ -1,12 +1,11 @@
 <template>
   
-  <div id="background">
-    <album-view/>
-    <!--PLAY BOX-->
-    <play-box-view />
-    <!-- <input type="file" ref="myfile">
-    <button id="addButton" @click="upload">ADD</button> -->
-  </div>
+  <div id="background"></div>
+  <album-view/>
+  <!--PLAY BOX-->
+  <play-box-view />
+  <!-- <input type="file" ref="myfile">
+  <button id="addButton" @click="upload">ADD</button> -->
   
 </template>
 
@@ -31,7 +30,8 @@ export default {
       let albumIndex = 0;
       let albumTitle = $(".albumTitle");
       albumTitle.text(albumList[0]);
-      var isShuffle = false;
+      let isShuffle = false;
+      let shuffleButton = $("#shuffleButton");
       // let shuffleButton = document.getElementById("shuffleButton")
       let queue = [];
       let queueIndex = 0;
@@ -49,6 +49,8 @@ export default {
         //getCloudImages();
         buildTrackList(albumTitle.text());
 
+        // initialize Shuffle button
+        shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
         /*
         ---COMPLETED---
           TODO: 
@@ -86,17 +88,31 @@ export default {
 
         $("#shuffleButton").click(function(){
           if(!songIsPlaying){
-            var shuffleButton = $(this);
             if(isShuffle){
               isShuffle = false;
               shuffleButton.text("SHUFFLE OFF");
+              shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
             }
             else{
               isShuffle = true;
               shuffleButton.text("SHUFFLE ON");
+              // document.getElementById("shuffleButton").style.backgroundImage = "url("+ imagePath2 +")";
+              shuffleButton.attr("src",require("../assets/SHUFFLE_ON.png"));
             }
           }
-        });  
+        }); 
+        
+     
+        $("#shuffleButton").hover(function(){
+          shuffleButton.attr("src",require("../assets/SHUFFLE_H.png"));
+        },function(){
+          if(isShuffle){
+            shuffleButton.attr("src",require("../assets/SHUFFLE_ON.png"));
+          }
+          else{
+            shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
+          } 
+        })
 
         
 
@@ -149,7 +165,7 @@ export default {
                   }
                   else{
                     currAlbumCover.attr("src",url);
-                    
+                    document.getElementById("background").style.backgroundImage = "url("+url+")";
                     //$("#displayAlbum").attr("src",url);
                   }
                   
@@ -299,6 +315,7 @@ export default {
             
             for(var j=0; j<2; j++){
                 var td = $('<b>');
+                td.attr("style","color: black;");
                 if(j==0){
                   //print number of track in album
                   td.text(i+1);
@@ -380,8 +397,19 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="css">
-body{
+/* body{
   background-image: url("../assets/background.jpg");
+} */
+#background{
+  position: fixed;
+  bottom: 0%;
+  right: 0%;
+  width: 100%;
+  height: 100%;
+  background-image: url("../assets/background.jpg");
+  background-position: center;
+  filter: blur(8px);
+  -webkit-filter: blur(8px);  
 }
 
 .tracks{

@@ -3,15 +3,17 @@
     <div id="albumNavigation">
       <a id="leftArrow" class="navigation"></a>
       
-      <div id="albumContainer">
-        <img alt="Album Cover" id="albumCover" src="">
-        <div id="albumTrackContainer"></div>
-      </div>
+        
+        <div id="albumContainer">
+          <img alt="Album Cover" id="albumCover" src="">
+          <div id="albumTrackContainer"></div>
+        </div>
+      
+      
       <!-- <img alt="Loading..." id="loadingScreen" src=""> -->
       <p id="lScreen" ></p>
       <a id="rightArrow" class="navigation"></a>
     </div>  
-    
 </template>
 
 <script>
@@ -22,8 +24,15 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="css">
+.albumTitle{
+  margin: auto;
+  height: 5%;
+  font-size: 30px;
+  color: white;
+  text-shadow: 1px 0 black,0 1px black, 1px 0 black, 0 -1px black;
+}
 #albumContainer{
-  max-width: 350px;
+  max-width: 65%;
   margin: auto;
   border:  1px solid black;
   border-collapse: collapse;
@@ -37,7 +46,7 @@ export default {
 #albumTrackContainer{
   overflow-y: scroll;
   width: 100%;
-  height: 70px;
+  max-height: 70px;
 }
 #loadingScreen{
   max-height: 50%;
@@ -89,6 +98,7 @@ export default {
   position: absolute;
   display: grid;
   grid-template-columns: 10% auto 10%;
+  margin-bottom: 10%;
 }
 
 </style>
