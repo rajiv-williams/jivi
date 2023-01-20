@@ -19,6 +19,7 @@
 <script>
 export default {
   name: 'AlbumView'
+  
 }
 </script>
 
@@ -68,27 +69,43 @@ export default {
   margin-top: 200px;
 }
 #leftArrow{
-  width: 0;
+  /* width: 0;
 	height: 0;
-  margin: auto;
-	border-top: 35px solid transparent;
+  margin: auto; */
+	/* border-top: 35px solid transparent;
 	border-right: 50px solid rgb(11, 11, 11);
-	border-bottom: 35px solid transparent;
+	border-bottom: 35px solid transparent; */
+  height: 100%;
+  width: 100%;
+  margin: auto;
+  background-image: url("../assets/NAV_BUTTON_L.png");
+  background-size: 200px;
+  background-repeat:no-repeat;
+  background-position: center;
 }
 #leftArrow:hover{
-  border-right: 50px solid rgb(147, 147, 147); 
+  /* border-right: 50px solid rgb(11, 11, 11); */
+  opacity: 30%; 
 }
 
 #rightArrow{
-  width: 0;
+  /* width: 0;
 	height: 0;
   margin: auto;
 	border-top: 35px solid transparent;
 	border-left: 50px solid rgb(11, 11, 11);
-	border-bottom: 35px solid transparent;
+	border-bottom: 35px solid transparent; */
+  height: 100%;
+  width: 100%;
+  margin: auto;
+  background-image: url("../assets/NAV_BUTTON_R.png");
+  background-size: 200px;
+  background-repeat:no-repeat;
+  background-position: center;
 }
 #rightArrow:hover{
-  border-left: 50px solid rgb(100, 100, 100); 
+  /* border-left: 50px solid rgb(100, 100, 100);  */
+  opacity: 30%; 
 }
 #albumNavigation{
   width: 50%;

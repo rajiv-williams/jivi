@@ -22,14 +22,13 @@ export default {
   components: {PlayBoxView,AlbumView},
   mounted(){
       
-      let albumList = ["NOSTALGIA","RESET"];
+      let albumList = [];
       let trackContainer = $("#albumTrackContainer");
       let currAlbumCover = $("#albumCover");
       let currTrackList = [];
 
       let albumIndex = 0;
       let albumTitle = $(".albumTitle");
-      albumTitle.text(albumList[0]);
       let isShuffle = false;
       let shuffleButton = $("#shuffleButton");
       // let shuffleButton = document.getElementById("shuffleButton")
@@ -47,8 +46,8 @@ export default {
 
         //TODO: INCLUDE IN README, PROGRAM WORKS BEST IN CHROME
         //getCloudImages();
+        await getAlbums();
         buildTrackList(albumTitle.text());
-
         // initialize Shuffle button
         shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
         /*
@@ -112,9 +111,7 @@ export default {
           else{
             shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
           } 
-        })
-
-        
+        })  
 
         $("#nextButton").click(playNextOrPrev);      
         $("#prevButton").click(playNextOrPrev);      
@@ -140,14 +137,34 @@ export default {
       //   });
 
       // }
-      
+      async function getAlbums(){
+
+        // get all folders in the root
+        const listRef = ref(storage, "");
+
+        await listAll(listRef).then((res) =>{
+
+          res.prefixes.forEach((folderRef) => {
+            console.log("FOLDER NAME:"+folderRef.name)
+            albumList.push(folderRef.name);
+          });
+        }).catch((error) => {
+          // An error occurred
+          console.log(error);
+        });
+
+        if(albumList.length > 0){
+          albumTitle.text(albumList[0]);
+        }
+
+      }
       //https://firebase.google.com/docs/storage/web/list-files
       async function buildTrackList(albumDirectory){
 
         // SHOW CIRCULAR PROGRESS INDICATOR
 
         currTrackList = [];
-        //var albumCover;
+        
         const listRef = ref(storage, albumDirectory);
 
         await listAll(listRef).then((res) =>{
@@ -166,9 +183,7 @@ export default {
                   else{
                     currAlbumCover.attr("src",url);
                     document.getElementById("background").style.backgroundImage = "url("+url+")";
-                    //$("#displayAlbum").attr("src",url);
                   }
-                  
                   
                   if(res.items.length > 0 && res.items.length - 1 == index){
                     console.log("SONGS MainPage: "+currTrackList);
@@ -195,67 +210,91 @@ export default {
       }
 
       function playTrack(){
-          $(".trackNumber").attr("class","trackNumber play");
-          // console.log($(this).attr("id"));
-          defaultClass = "tracks grid-container";
+
+          // reset of symbol displayed when you hover over track number
+          // $(".trackNumber").attr("class","trackNumber play");
+          
+          // previous track that was playing is unhighlighted (reset)
           $(".playing").attr("class",defaultClass );
+
+          // previous track that was playing has play button show
+          // when hovered over (reset)
+          $("#controls"+trackNum).attr("class","trackNumber play");
+
           var currTrack = $(this);
           trackNum = currTrack.attr("id").split("track")[1]
           
-          //musicPlayer.src = trackList[parseInt(trackNum)-1].src;//require(currTrack.attr("src")); 
+          // change music player to current track
           musicPlayer.src = currTrackList[parseInt(trackNum)-1].src;
+
+          // currently playing track is highlighted
           currTrack.attr("class","playing "+ defaultClass);
 
           musicPlayer.play();
+
+          // display currently playing track info in PlayBox
           $("#songPlaying").text($("#track"+trackNum).attr("display"));
           document.getElementById("displayAlbum").style.visibility = "visible";
           $("#displayAlbum").attr("src",currAlbumCover.attr("src"));
 
-          //Display pause button whenever track Number is hovered over
-          //$("#controls"+trackNum).attr("class","trackNumber play");
-          $("#controls"+trackNum).attr("class","trackNumber");
-          // document.getElementById("print").innerHTML = currTrack.duration;
-          queueIndex = 0;
+          // Display pause button whenever track Number is hovered over
+          $("#controls"+trackNum).attr("class","trackNumber pause");
+
           console.log("CURRENT SONG: " + musicPlayer.getAttribute("src"))
+          
+          // initialize queue index to first song in queue
+          queueIndex = 0;
+
           queue = getQueue(musicPlayer.getAttribute("src"),isShuffle);
 
-          console.log("SHUFFLE: "+ isShuffle)
-          console.log("QUEUE: "+queue[0].trackName + ",,,,,,," +queue[1].trackName)
-
+          // play next track by default
           musicPlayer.onended = playNextOrPrev;
         
       }
-     
+
+      /* 
+        Function by default plays next track in queue.
+        If the element id contains 'prev', it plays the previous
+        track in the queue.
+      */
       function playNextOrPrev(){
 
-          //Display play button whenever track number is hovered over
+          // Display play button whenever track number is hovered over
           $("#controls"+trackNum).attr("class","trackNumber play");
           
+          
           if($(this).attr("id").match("prev")){
+            // make current track the previous track in the queue
             queueIndex--;
           }
           else{
+            // make current track the next track in the queue
             queueIndex++;
           }
           
           // if queueIndex is within range of the queue
           if(queueIndex < queue.length && queueIndex >= 0){
+              // previous track that was playing is unhighlighted (reset)
               $(".playing").attr("class",defaultClass);
+
+              // play the next track in the queue
               musicPlayer.src = queue[queueIndex].src;
               trackNum = queue[queueIndex].trackNumber;
               musicPlayer.play();
               $("#track"+trackNum).attr("class","playing " + defaultClass);
 
-              //Display pause button whenever track Number is hovered over
+              // Display pause button whenever track Number is hovered over
               $("#controls"+trackNum).attr("class","trackNumber pause");
+
+              // display currently playing track info in PlayBox
               $("#songPlaying").text($("#track"+trackNum).attr("display"));
               $("#displayAlbum").attr("src",currAlbumCover.attr("src"));
           }
           else{
+              // reset PlayBox and queue
               musicPlayer.src = "";
               $(".playing").attr("class",defaultClass );
               $("#songPlaying").text("");
-              //$("#displayAlbum").attr("src",require("../assets/Black_Box.png"));
               document.getElementById("displayAlbum").style.visibility = "hidden";
               queueIndex = 0;
               queue = [];
@@ -442,6 +481,9 @@ export default {
 	border-left: 25px solid rgb(11, 11, 11);
 	border-bottom: 15px solid transparent;
   white-space: nowrap;
+}
+.pause{
+  background-color: brown;
 }
 .trackNumber:hover.pause{
   text-indent: -9999px;
