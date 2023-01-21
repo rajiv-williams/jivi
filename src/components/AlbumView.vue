@@ -1,7 +1,7 @@
 <template>
     <h1 class="albumTitle">ALBUM TITLE</h1>
     <div id="albumNavigation">
-      <a id="leftArrow" class="navigation"></a>
+      <p id="leftArrow" class="navigation"></p>
       
         
         <div id="albumContainer">
@@ -12,7 +12,7 @@
       
       <!-- <img alt="Loading..." id="loadingScreen" src=""> -->
       <p id="lScreen" ></p>
-      <a id="rightArrow" class="navigation"></a>
+      <p id="rightArrow" class="navigation"></p>
     </div>  
 </template>
 
@@ -39,6 +39,7 @@ export default {
   border-collapse: collapse;
   box-shadow: 10px 10px black;
   visibility: hidden;
+  /* background-color: black; */
 }
 #albumCover{
   max-width: 100%;
@@ -47,8 +48,9 @@ export default {
 #albumTrackContainer{
   overflow-y: scroll;
   width: 100%;
-  max-height: 70px;
+  max-height: 90px;
 }
+
 #loadingScreen{
   max-height: 50%;
   max-width: 50%;
@@ -69,13 +71,7 @@ export default {
   margin-top: 200px;
 }
 #leftArrow{
-  /* width: 0;
-	height: 0;
-  margin: auto; */
-	/* border-top: 35px solid transparent;
-	border-right: 50px solid rgb(11, 11, 11);
-	border-bottom: 35px solid transparent; */
-  height: 100%;
+  height: 20%;
   width: 100%;
   margin: auto;
   background-image: url("../assets/NAV_BUTTON_L.png");
@@ -89,13 +85,7 @@ export default {
 }
 
 #rightArrow{
-  /* width: 0;
-	height: 0;
-  margin: auto;
-	border-top: 35px solid transparent;
-	border-left: 50px solid rgb(11, 11, 11);
-	border-bottom: 35px solid transparent; */
-  height: 100%;
+  height: 20%;
   width: 100%;
   margin: auto;
   background-image: url("../assets/NAV_BUTTON_R.png");

@@ -1,6 +1,9 @@
 <template>
   
-  <div id="background"></div>
+  <div id="background">
+    
+  </div>
+  
   <album-view/>
   <!--PLAY BOX-->
   <play-box-view />
@@ -24,15 +27,18 @@ export default {
       
       let albumList = [];
       let trackContainer = $("#albumTrackContainer");
-      let currAlbumCover = $("#albumCover");
+      //let currAlbumCover = $("#albumCover");
       let currTrackList = [];
+      let currTrackInfo = null;
 
       let albumIndex = 0;
       let albumTitle = $(".albumTitle");
+      let albumCoverSRC = "";
       let isShuffle = false;
       let shuffleButton = $("#shuffleButton");
       // let shuffleButton = document.getElementById("shuffleButton")
-      let queue = [];
+      let queue = {"queue":[],"albumCoverSRC":""};
+      //let queue = [];
       let queueIndex = 0;
       let musicPlayer = document.getElementById("musicPlayer");
       let trackNum = 0;
@@ -181,7 +187,8 @@ export default {
                     currTrackList.push({"src":url,"name":songName});
                   }
                   else{
-                    currAlbumCover.attr("src",url);
+                    $("#albumCover").attr("src",url);
+                    albumCoverSRC = url;
                     document.getElementById("background").style.backgroundImage = "url("+url+")";
                   }
                   
@@ -221,21 +228,19 @@ export default {
           // when hovered over (reset)
           $("#controls"+trackNum).attr("class","trackNumber play");
 
-          var currTrack = $(this);
-          trackNum = currTrack.attr("id").split("track")[1]
+          var currTrackElement = $(this);
+          trackNum = currTrackElement.attr("id").split("track")[1]
           
           // change music player to current track
-          musicPlayer.src = currTrackList[parseInt(trackNum)-1].src;
+          currTrackInfo = currTrackList[parseInt(trackNum)-1];
+          musicPlayer.src = currTrackInfo.src;
 
           // currently playing track is highlighted
-          currTrack.attr("class","playing "+ defaultClass);
+          currTrackElement.attr("class","playing "+ defaultClass);
 
           musicPlayer.play();
 
-          // display currently playing track info in PlayBox
-          $("#songPlaying").text($("#track"+trackNum).attr("display"));
-          document.getElementById("displayAlbum").style.visibility = "visible";
-          $("#displayAlbum").attr("src",currAlbumCover.attr("src"));
+          
 
           // Display pause button whenever track Number is hovered over
           $("#controls"+trackNum).attr("class","trackNumber pause");
@@ -246,6 +251,11 @@ export default {
           queueIndex = 0;
 
           queue = getQueue(musicPlayer.getAttribute("src"),isShuffle);
+
+          // display currently playing track info in PlayBox
+          $("#songPlaying").text(queue.queue[0].trackName);
+          document.getElementById("displayAlbum").style.visibility = "visible";
+          $("#displayAlbum").attr("src",queue.albumCoverSRC);
 
           // play next track by default
           musicPlayer.onended = playNextOrPrev;
@@ -271,24 +281,30 @@ export default {
             // make current track the next track in the queue
             queueIndex++;
           }
+
+          for(var i = 0; i < queue.queue.length; i++){
+            console.log("QUEUE["+i+"]: " + queue.queue[i].trackName);
+          }
+          
           
           // if queueIndex is within range of the queue
-          if(queueIndex < queue.length && queueIndex >= 0){
+          if(queueIndex < queue.queue.length && queueIndex >= 0){
               // previous track that was playing is unhighlighted (reset)
               $(".playing").attr("class",defaultClass);
 
               // play the next track in the queue
-              musicPlayer.src = queue[queueIndex].src;
-              trackNum = queue[queueIndex].trackNumber;
+              musicPlayer.src = queue.queue[queueIndex].src;
+              trackNum = queue.queue[queueIndex].trackNumber;
               musicPlayer.play();
+
               $("#track"+trackNum).attr("class","playing " + defaultClass);
 
               // Display pause button whenever track Number is hovered over
               $("#controls"+trackNum).attr("class","trackNumber pause");
 
               // display currently playing track info in PlayBox
-              $("#songPlaying").text($("#track"+trackNum).attr("display"));
-              $("#displayAlbum").attr("src",currAlbumCover.attr("src"));
+              $("#songPlaying").text(queue.queue[queueIndex].trackName);
+              $("#displayAlbum").attr("src",queue.albumCoverSRC);
           }
           else{
               // reset PlayBox and queue
@@ -297,7 +313,7 @@ export default {
               $("#songPlaying").text("");
               document.getElementById("displayAlbum").style.visibility = "hidden";
               queueIndex = 0;
-              queue = [];
+              queue.queue = [];
           }
         
       }
@@ -335,13 +351,15 @@ export default {
         for(var i=0; i<currTrackList.length; i++){
             trackContainer.children()[0].remove();        
         }
-        queue = [];
+        // queue = [];
       }
 
       function buildAlbum(album){
         
+
+        
         for(var i=0; i<currTrackList.length; i++){
-            var tr = $('<a>');
+            var tr = $('<div>');
             var song = currTrackList[i];
             
 
@@ -363,7 +381,17 @@ export default {
                 }
                 if(j==1){
                   td.text(song.name);
+                  // if(currTrackInfo != null && song.name == currTrackInfo.name){
+                  //   alert(song.name);
+                  //   tr.attr("class","tracks grid-container playing");
+                  //   queue = getQueue(currTrackInfo.src,isShuffle);
+                  // }
+                  // else{
+                  //   td.attr("class","songTitle");
+                  // }
                   td.attr("class","songTitle");
+                  
+
                 }
                 tr.append(td);
                 
@@ -381,7 +409,8 @@ export default {
         its album (trackList) and whether shuffle is on or not
       */
       function getQueue(currTrackPath,isShuffle){    
-          var queue = [];
+          queue.queue = [];
+          queue.albumCoverSRC = albumCoverSRC;
           //when shuffle is off
    
           if(!isShuffle){
@@ -391,14 +420,18 @@ export default {
                   if(currTrackList[i].src == currTrackPath){
                       //skip current track from adding it to the queue
                       console.log("if loop: " + currTrackList[i].name)
-                      queue[queue.length] = {"src":currTrackList[i].src,"trackNumber":i+1,"trackName":currTrackList[i].name};
+                      queue.queue.push({"src":currTrackList[i].src,"trackNumber":i+1,"trackName":currTrackList[i].name});
                       currTrackIndex = i;
                   }
-                  if(i > currTrackIndex){
+                  // if track is after current track and 
+                  // current track is not the last track in the tracklist
+                  if(i > currTrackIndex && trackNum != currTrackList.length){
                     //create a queue in chronological order
-                    queue[queue.length] = {"src":currTrackList[i].src,"trackNumber":i+1,"trackName":currTrackList[i].name};
+                    queue.queue.push({"src":currTrackList[i].src,"trackNumber":i+1,"trackName":currTrackList[i].name});
+                    console.log("if loop: " + currTrackList[i].name)
                   }
               }
+              console.log(queue);
               return queue;
           }
 
@@ -408,7 +441,7 @@ export default {
               for(i = 0; i < currTrackList.length; i++){
                   //add current track to the front of the start of the queue
                   if(currTrackList[i].src == currTrackPath){
-                    queue.push({"src":currTrackList[i].src,"trackNumber":i+1,"trackName":currTrackList[i].name});
+                    queue.queue.push({"src":currTrackList[i].src,"trackNumber":i+1,"trackName":currTrackList[i].name});
                       ignoredIndexes.push(i);
                       break;
                   }
@@ -419,9 +452,9 @@ export default {
                   var randSongIndex = Math.floor(Math.random() * currTrackList.length);
 
                   //makes sure each song in the queue is unique
-                  if(queue.indexOf(randSongIndex) == -1 && !ignoredIndexes.includes(randSongIndex)){
+                  if(queue.queue.indexOf(randSongIndex) == -1 && !ignoredIndexes.includes(randSongIndex)){
                       //add random song from trackList to the queue
-                      queue.push({"src":currTrackList[randSongIndex].src,"trackNumber":randSongIndex+1,"trackName":currTrackList[randSongIndex].name});
+                      queue.queue.push({"src":currTrackList[randSongIndex].src,"trackNumber":randSongIndex+1,"trackName":currTrackList[randSongIndex].name});
                       ignoredIndexes.push(randSongIndex);
                   }
               }  
@@ -452,10 +485,10 @@ export default {
 }
 
 .tracks{
-    max-width: 400px;
+    max-width: 100%;
+    max-height: 45px;
     background-color: white;
     font-size: 30px;
-  
 }
 .tracks:hover{
     opacity: 0.9;
@@ -467,33 +500,34 @@ export default {
 }
 .grid-container {
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: 20% 70% 10%;
 }
 .trackNumber{
   text-align: left;
   margin-left: 10px;
 }
-.trackNumber:hover.play{
+/* .trackNumber:hover.play{
   text-indent: -9999px;
   width: 0;
-	height: 0;
+  height:0;
+  margin-left: 10px;
+  margin: auto;
 	border-top: 15px solid transparent;
 	border-left: 25px solid rgb(11, 11, 11);
 	border-bottom: 15px solid transparent;
   white-space: nowrap;
 }
-.pause{
-  background-color: brown;
-}
+
 .trackNumber:hover.pause{
   text-indent: -9999px;
   width: 0px;
 	height: 30px;
+  margin-left: 10px;
   border-style: double;
   border-width: 0px 0px 0px 25px;
   border-color: solid rgb(11, 11, 11);
   white-space: nowrap;
-}
+} */
 /* .songTitle{
    text-align: justify;
 } */

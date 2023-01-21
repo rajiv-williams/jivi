@@ -1,8 +1,11 @@
 <template>
     <!--PLAY BOX-->
     <div id="playBox">
-      <img id="displayAlbum" alt="Album Cover" src="">  
-      <a id="songPlaying"></a>
+      <div class="songDetails">
+        <img id="displayAlbum" alt="Album Cover" src=""> 
+        <a id="songPlaying"></a>
+      </div>
+      
       
       <p id="prevButton"></p>
       <audio id="musicPlayer"></audio>
@@ -24,15 +27,17 @@ export default {
 <style lang="css">
 
 #displayAlbum{
-  max-width: 80px;
-  max-height: 80px;
+  width: 100px;
+  height: 100px;
   margin: auto;
   visibility: hidden;
 }
 #songPlaying{
   margin: auto;
-  width: 150px;
+  margin-left: 50%;
+  width: 100%;
   color: rgb(225, 225, 225);
+  font-size: 100%;
 }
 #albumTracks{
   overflow-y: scroll;
@@ -48,12 +53,18 @@ export default {
   margin: auto;
   background-color: black;
   display: grid;
-  grid-template-columns: 10% 10% 5% auto 5% 17%;
+  grid-template-columns: 20% 20% 20% 20% 20%;
 }
 
+.songDetails{
+  padding: 10px;
+  display: grid;
+  margin: auto;
+  grid-template-columns:  auto 150px;
+}
 
 #musicPlayer{
-  width: 100%;
+  max-width: 100%;
   margin: auto;
 }
 #musicPlayer::-webkit-media-controls-panel {
@@ -63,39 +74,29 @@ export default {
 
 #prevButton{
   height: 40%;
-  width: 100%;
+  width: 40%;
   margin: auto;
+  margin-left: 50%;
   background-image: url("../assets/PREV.png");
   background-size: 80%;
   background-repeat:no-repeat;
   background-position: center;
 }
 #prevButton:hover{
-  height: 40%;
-  width: 100%;
-  margin: auto;
   background-image: url("../assets/PREV_H.png");
-  background-size: 80%;
-  background-repeat:no-repeat;
-  background-position: center;
 }
 #nextButton{
   height: 40%;
-  width: 100%;
+  width: 40%;
   margin: auto;
+  margin-right: 50%;
   background-image: url("../assets/NEXT.png");
   background-size: 80%;
   background-repeat:no-repeat;
   background-position: center;
 }
 #nextButton:hover{
-  height: 40%;
-  width: 100%;
-  margin: auto;
   background-image: url("../assets/NEXT_H.png");
-  background-size: 80%;
-  background-repeat:no-repeat;
-  background-position: center;
 }
 #shuffleButton{
   height: 70%;
