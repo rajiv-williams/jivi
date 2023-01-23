@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "bl": "^6.0.0",
     "browserify": "^17.0.0",
     "browserify-fs": "^1.0.0",
     "core-js": "^3.8.3",
@@ -19,6 +20,7 @@
     "jquery": "^3.6.0",
     "path-browserify": "^1.0.1",
     "require-context": "^1.1.0",
+    "semver": "^7.3.8",
     "vue": "^3.2.13"
   },
   "devDependencies": {
