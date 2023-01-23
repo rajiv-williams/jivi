@@ -6,7 +6,7 @@
         
         <div id="albumContainer">
           <img alt="Album Cover" id="albumCover" src="">
-          <div id="albumTrackContainer"></div>
+          <!-- <div id="albumTrackContainer"></div> -->
         </div>
       
       
@@ -44,6 +44,9 @@ export default {
 #albumCover{
   max-width: 100%;
   max-height: 100%;
+}
+#albumCover:hover{
+  opacity: 70%;
 }
 #albumTrackContainer{
   overflow-y: scroll;

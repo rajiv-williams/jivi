@@ -1,14 +1,17 @@
 <template>
-  
   <div id="background">
     
   </div>
-  
+  <!--Navigation Bar-->
+  <nav-bar/>  
   <album-view/>
+
+   
   <!--PLAY BOX-->
   <play-box-view />
   <!-- <input type="file" ref="myfile">
   <button id="addButton" @click="upload">ADD</button> -->
+  
   
 </template>
 
@@ -16,20 +19,21 @@
 import $ from 'jquery';
 import PlayBoxView from '@/components/PlayBoxView.vue';
 import AlbumView from '@/components/AlbumView.vue'
+import NavBar from '@/components/NavBar.vue';
 import { storage } from "@/firebase/firebase"
 import {ref,listAll,getDownloadURL,getMetadata} from "firebase/storage"
 import "firebase/storage"
 
 export default {
   name: 'MainPageView',
-  components: {PlayBoxView,AlbumView},
+  components: {PlayBoxView,AlbumView,NavBar},
   mounted(){
       
       let albumList = [];
       let trackContainer = $("#albumTrackContainer");
       //let currAlbumCover = $("#albumCover");
       let currTrackList = [];
-      let currTrackInfo = null;
+      let currTrackSRC = null;
 
       let albumIndex = 0;
       let albumTitle = $(".albumTitle");
@@ -42,9 +46,10 @@ export default {
       let queueIndex = 0;
       let musicPlayer = document.getElementById("musicPlayer");
       let trackNum = 0;
-      let defaultClass = "tracks grid-container";
+      let defaultClass = "tracks";
       musicPlayer.controls = true;
       let songIsPlaying = false;
+      let sideQueue = $("#sideQueueContainer");
       
       
       
@@ -89,9 +94,8 @@ export default {
           }
           
         });
-        
 
-        $("#shuffleButton").click(function(){
+        shuffleButton.click(function(){
           if(!songIsPlaying){
             if(isShuffle){
               isShuffle = false;
@@ -106,9 +110,8 @@ export default {
             }
           }
         }); 
-        
      
-        $("#shuffleButton").hover(function(){
+        shuffleButton.hover(function(){
           shuffleButton.attr("src",require("../assets/SHUFFLE_H.png"));
         },function(){
           if(isShuffle){
@@ -120,7 +123,9 @@ export default {
         })  
 
         $("#nextButton").click(playNextOrPrev);      
-        $("#prevButton").click(playNextOrPrev);      
+        $("#prevButton").click(playNextOrPrev);   
+        
+        $("#albumCover").click(playTrack);
 
       });
 
@@ -184,7 +189,7 @@ export default {
                 .then((metadata) => {
                   songName = metadata.name.split(".")[0].toUpperCase().replace("_"," ")
                   if(url.match(".mp3")){
-                    currTrackList.push({"src":url,"name":songName});
+                    currTrackList.push({"src":url,"name":songName,"order":index+1});
                   }
                   else{
                     $("#albumCover").attr("src",url);
@@ -228,16 +233,27 @@ export default {
           // when hovered over (reset)
           $("#controls"+trackNum).attr("class","trackNumber play");
 
-          var currTrackElement = $(this);
-          trackNum = currTrackElement.attr("id").split("track")[1]
+          var htmlElement = $(this);
+          var clickedAlbumCover = htmlElement.attr("id").match("albumCover");
+
+          // if album cover is clicked
+          if(clickedAlbumCover){
+            // start with first track in album
+            trackNum = "1";
+
+            // change music player to current track
+            currTrackSRC = currTrackList[parseInt(trackNum)-1].src;
+            //alert(currTrackList[parseInt(trackNum)-1].name)
+            musicPlayer.src = currTrackSRC;
+          }
+          // if an actual track is clicked
+          else{
+            trackNum = htmlElement.attr("id").split("track")[1];
+
+            currTrackSRC = htmlElement.attr("src");
+            musicPlayer.src = currTrackSRC;
+          }
           
-          // change music player to current track
-          currTrackInfo = currTrackList[parseInt(trackNum)-1];
-          musicPlayer.src = currTrackInfo.src;
-
-          // currently playing track is highlighted
-          currTrackElement.attr("class","playing "+ defaultClass);
-
           musicPlayer.play();
 
           
@@ -250,10 +266,27 @@ export default {
           // initialize queue index to first song in queue
           queueIndex = 0;
 
-          queue = getQueue(musicPlayer.getAttribute("src"),isShuffle);
+
+          if(queue.queue.length > 0 && !clickedAlbumCover){
+            trackNum = 1;  
+            queue = getQueue(currTrackSRC,isShuffle,queue.queue);          
+          }
+          else{
+            queue = getQueue(currTrackSRC,isShuffle,currTrackList);
+          }
+
+          
+          buildSideQueue(sideQueue);      
+          
+          //alert(currTrackSRC)
+          
+
+          // currently playing track is highlighted
+          $(".track"+queue.queue[0]["order"]).attr("class","playing "+ defaultClass);
+          //alert("t:"+trackNum + " vs q:" + queue.queue[0]["order"])
 
           // display currently playing track info in PlayBox
-          $("#songPlaying").text(queue.queue[0].trackName);
+          $("#songPlaying").text(queue.queue[0].name);
           document.getElementById("displayAlbum").style.visibility = "visible";
           $("#displayAlbum").attr("src",queue.albumCoverSRC);
 
@@ -283,7 +316,7 @@ export default {
           }
 
           for(var i = 0; i < queue.queue.length; i++){
-            console.log("QUEUE["+i+"]: " + queue.queue[i].trackName);
+            console.log("QUEUE["+i+"]: " + queue.queue[i].name);
           }
           
           
@@ -294,7 +327,7 @@ export default {
 
               // play the next track in the queue
               musicPlayer.src = queue.queue[queueIndex].src;
-              trackNum = queue.queue[queueIndex].trackNumber;
+              trackNum = queue.queue[queueIndex].order;
               musicPlayer.play();
 
               $("#track"+trackNum).attr("class","playing " + defaultClass);
@@ -303,7 +336,7 @@ export default {
               $("#controls"+trackNum).attr("class","trackNumber pause");
 
               // display currently playing track info in PlayBox
-              $("#songPlaying").text(queue.queue[queueIndex].trackName);
+              $("#songPlaying").text(queue.queue[queueIndex].name);
               $("#displayAlbum").attr("src",queue.albumCoverSRC);
           }
           else{
@@ -314,6 +347,7 @@ export default {
               document.getElementById("displayAlbum").style.visibility = "hidden";
               queueIndex = 0;
               queue.queue = [];
+              resetSideQueue();
           }
         
       }
@@ -348,15 +382,13 @@ export default {
         document.getElementById("albumContainer").style.display = "none";
         //document.getElementById("loadingScreen").style.display = "block";
         document.getElementById("lScreen").style.display = "block";
-        for(var i=0; i<currTrackList.length; i++){
-            trackContainer.children()[0].remove();        
-        }
+        // for(var i=0; i<currTrackList.length; i++){
+        //     trackContainer.children()[0].remove();        
+        // }
         // queue = [];
       }
 
       function buildAlbum(album){
-        
-
         
         for(var i=0; i<currTrackList.length; i++){
             var tr = $('<div>');
@@ -364,7 +396,7 @@ export default {
             
 
             // var songName = path.parse(songPath).name;
-            tr.attr('id', 'track' + (i+1));
+            // tr.attr('id', 'track' + (i+1));
             tr.attr("src",song.src);
             tr.attr("display", song.name + " - " + "RAJIV");
             tr.attr("class","tracks grid-container");
@@ -372,7 +404,7 @@ export default {
             
             for(var j=0; j<2; j++){
                 var td = $('<b>');
-                td.attr("style","color: black;");
+                td.attr("style","color: white;");
                 if(j==0){
                   //print number of track in album
                   td.text(i+1);
@@ -403,32 +435,85 @@ export default {
         //document.getElementById("loadingScreen").style.display = "none";
         document.getElementById("lScreen").style.display = "none";
       }
+
+    //   <!-- <div class="sideQueue">
+    //     <label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>
+    //     <ul class="queueList">
+    //       <li>
+    //           <div class="tracks">Menu-1</div>
+    //       </li>
+    //       <li>
+    //           <div class="tracks">Menu-2</div>
+    //       </li>
+    //     </ul>
+    // </div> -->
+      function resetSideQueue(){
+        console.log("CHILDREN: "+sideQueue.children().length)
+        if(sideQueue.children().length == 2){
+          for(var i = 0; i < 2; i++){
+            sideQueue.children()[0].remove();
+          }
+        }        
+        document.getElementById("sideQueue").checked = false;
+        // if(isInitialization){
+        //   sideQueue.append('<label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>');
+        // }
+      }
+      function buildSideQueue(sideQueue){
+        
+        
+        resetSideQueue();
+        document.getElementById("sideQueue").checked = true;
+        
+        var ul = $("<ul>");
+        ul.attr("class","queueList");
+        sideQueue.append('<label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>');
+
+        for(var i=0; i<queue.queue.length; i++){
+            
+            var song = queue.queue[i];
+            
+            var li = $("<li>");
+            var div = $("<div>");
+            // var songName = path.parse(songPath).name;
+            div.attr('id', 'track' + (i+1));
+            div.attr("src",song.src);
+            div.attr("class","tracks "+ 'track' + (i+1));
+            div.text(song.name);
+            div.click(playTrack);
+            
+            li.append(div);
+            ul.append(li);
+        }
+
+        sideQueue.append(ul);
+      }
      
       /*
         Returns a queue based on the current track, 
         its album (trackList) and whether shuffle is on or not
       */
-      function getQueue(currTrackPath,isShuffle){    
+      function getQueue(currTrackPath,isShuffle,tracklist){    
           queue.queue = [];
           queue.albumCoverSRC = albumCoverSRC;
           //when shuffle is off
    
           if(!isShuffle){
               var currTrackIndex = 0;
-              for(var i = 0; i < currTrackList.length; i++){
-                  console.log("TRACKLIST : " + currTrackList[i].name)
-                  if(currTrackList[i].src == currTrackPath){
+              for(var i = 0; i < tracklist.length; i++){
+                  console.log("TRACKLIST : " + tracklist[i].name)
+                  if(tracklist[i].src == currTrackPath){
                       //skip current track from adding it to the queue
-                      console.log("if loop: " + currTrackList[i].name)
-                      queue.queue.push({"src":currTrackList[i].src,"trackNumber":i+1,"trackName":currTrackList[i].name});
+                      console.log("if loop: " + tracklist[i].name)
+                      queue.queue.push({"src":tracklist[i].src,"order":queue.queue.length+1,"name":tracklist[i].name});
                       currTrackIndex = i;
                   }
                   // if track is after current track and 
                   // current track is not the last track in the tracklist
-                  if(i > currTrackIndex && trackNum != currTrackList.length){
+                  if(i > currTrackIndex){
                     //create a queue in chronological order
-                    queue.queue.push({"src":currTrackList[i].src,"trackNumber":i+1,"trackName":currTrackList[i].name});
-                    console.log("if loop: " + currTrackList[i].name)
+                    queue.queue.push({"src":tracklist[i].src,"order":queue.queue.length+1,"name":tracklist[i].name});
+                    console.log("if loop: " + tracklist[i].name)
                   }
               }
               console.log(queue);
@@ -438,23 +523,23 @@ export default {
           //when shuffle is on
           if(isShuffle){
               var ignoredIndexes = [];
-              for(i = 0; i < currTrackList.length; i++){
+              for(i = 0; i < tracklist.length; i++){
                   //add current track to the front of the start of the queue
-                  if(currTrackList[i].src == currTrackPath){
-                    queue.queue.push({"src":currTrackList[i].src,"trackNumber":i+1,"trackName":currTrackList[i].name});
+                  if(tracklist[i].src == currTrackPath){
+                    queue.queue.push({"src":tracklist[i].src,"order":queue.queue.length+1,"name":tracklist[i].name});
                       ignoredIndexes.push(i);
                       break;
                   }
               }
               
           
-              while(queue.length <= currTrackList.length -1){
-                  var randSongIndex = Math.floor(Math.random() * currTrackList.length);
+              while(queue.queue.length < tracklist.length){
+                  var randSongIndex = Math.floor(Math.random() * tracklist.length);
 
                   //makes sure each song in the queue is unique
                   if(queue.queue.indexOf(randSongIndex) == -1 && !ignoredIndexes.includes(randSongIndex)){
                       //add random song from trackList to the queue
-                      queue.queue.push({"src":currTrackList[randSongIndex].src,"trackNumber":randSongIndex+1,"trackName":currTrackList[randSongIndex].name});
+                      queue.queue.push({"src":tracklist[randSongIndex].src,"order":queue.queue.length+1,"name":tracklist[randSongIndex].name});
                       ignoredIndexes.push(randSongIndex);
                   }
               }  
@@ -473,6 +558,7 @@ export default {
   background-image: url("../assets/background.jpg");
 } */
 #background{
+  /* position: fixed; */
   position: fixed;
   bottom: 0%;
   right: 0%;
@@ -483,16 +569,21 @@ export default {
   filter: blur(8px);
   -webkit-filter: blur(8px);  
 }
-
+.queueList{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
 .tracks{
     max-width: 100%;
     max-height: 45px;
-    background-color: white;
+    background-color: black;
     font-size: 30px;
+    color: white;
 }
 .tracks:hover{
     opacity: 0.9;
-    background-color: rgb(230, 230, 230);
+    background-color: rgb(34, 34, 34);
 }
 .playing{
     opacity: 0.9;
