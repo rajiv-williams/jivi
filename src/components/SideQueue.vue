@@ -16,7 +16,7 @@
 
 <script>
 export default {
-    name: "DropZone"
+    name: "SideQueue"
 }
 </script>
 

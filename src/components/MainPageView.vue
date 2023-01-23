@@ -1,12 +1,8 @@
 <template>
-  <div id="background">
-    
-  </div>
-  <!--Navigation Bar-->
-  <nav-bar/>  
-  <album-view/>
 
-   
+  <div id="background"></div>
+  <side-queue/>  
+  <album-view/>   
   <!--PLAY BOX-->
   <play-box-view />
   <!-- <input type="file" ref="myfile">
@@ -19,14 +15,14 @@
 import $ from 'jquery';
 import PlayBoxView from '@/components/PlayBoxView.vue';
 import AlbumView from '@/components/AlbumView.vue'
-import NavBar from '@/components/NavBar.vue';
+import SideQueue from '@/components/SideQueue.vue';
 import { storage } from "@/firebase/firebase"
 import {ref,listAll,getDownloadURL,getMetadata} from "firebase/storage"
 import "firebase/storage"
 
 export default {
   name: 'MainPageView',
-  components: {PlayBoxView,AlbumView,NavBar},
+  components: {PlayBoxView,AlbumView,SideQueue},
   mounted(){
       
       let albumList = [];
@@ -50,6 +46,7 @@ export default {
       musicPlayer.controls = true;
       let songIsPlaying = false;
       let sideQueue = $("#sideQueueContainer");
+      let playAlbumAutomatically = false;
       
       
       
@@ -61,6 +58,7 @@ export default {
         buildTrackList(albumTitle.text());
         // initialize Shuffle button
         shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
+        $(".playButton").attr("src",require("../assets/PLAY_BUTTON.png"))
         /*
         ---COMPLETED---
           TODO: 
@@ -74,26 +72,8 @@ export default {
         //HAVE AN EVENT HANDLER FOR WHEN A NEXT ARROW IS CLICKED
         //REMEMBER WHERE IN THE LIST OF ALBUMS YOU ARE        
 
-        $("#leftArrow").click(function(){
-
-          if(albumIndex != 0){
-            resetAlbum();
-            albumIndex -= 1;
-            albumTitle.text(albumList[albumIndex]);
-            buildTrackList(albumTitle.text());
-          }
-          
-        });
-        $("#rightArrow").click(function(){
-
-          if(albumIndex < albumList.length -1){
-            resetAlbum()
-            albumIndex+=1;
-            albumTitle.text(albumList[albumIndex]);
-            buildTrackList(albumTitle.text());
-          }
-          
-        });
+        $("#leftArrow").click(showPrevAlbum);
+        $("#rightArrow").click(showNextAlbum);
 
         shuffleButton.click(function(){
           if(!songIsPlaying){
@@ -122,12 +102,54 @@ export default {
           } 
         })  
 
+        $(".playable").hover(function(){
+          var children = document.getElementById($(this).attr("id")).children;
+          console.log(children.length)
+          // show play button overlay
+          for(var i = 0; i < children.length; i++){
+            if(children[i].className != null && children[i].className.match("playButton")){
+              //alert("test")
+              children[i].style.display = "block";
+            }
+          }
+        }, function(){
+          var children = document.getElementById($(this).attr("id")).children;
+          // show play button overlay
+          for(var i = 0; i < children.length; i++){
+            if(children[i].className != null && children[i].className.match("playButton")){
+              children[i].style.display = "none";
+            }
+          }
+        })
+
         $("#nextButton").click(playNextOrPrev);      
         $("#prevButton").click(playNextOrPrev);   
         
         $("#albumCover").click(playTrack);
 
       });
+
+      function showPrevAlbum(){
+
+          if(albumIndex != 0){
+            resetAlbum();
+            albumIndex -= 1;
+            albumTitle.text(albumList[albumIndex]);
+            buildTrackList(albumTitle.text());
+          }
+          
+        }
+
+      async function showNextAlbum(){
+
+          if(albumIndex < albumList.length -1){
+            resetAlbum()
+            albumIndex+=1;
+            albumTitle.text(albumList[albumIndex]);
+            await buildTrackList(albumTitle.text());
+          }
+          
+        }
 
       // function getCloudImages(){
         
@@ -203,6 +225,11 @@ export default {
                     // HIDE CIRCULAR PROGRESS INDICATOR
 
                     buildAlbum(trackContainer);
+
+                    if(playAlbumAutomatically){
+                      playTrack();
+                      playAlbumAutomatically = false;
+                    }
                     console.log(url);
                   }
                   index += 1;
@@ -234,10 +261,15 @@ export default {
           $("#controls"+trackNum).attr("class","trackNumber play");
 
           var htmlElement = $(this);
-          var clickedAlbumCover = htmlElement.attr("id").match("albumCover");
+
+          // play all tracks from when you open the album
+          var playFromAlbumCover = true; 
+          if(htmlElement.attr("id") != undefined){
+            playFromAlbumCover = htmlElement.attr("id").match("albumCover");
+          }      
 
           // if album cover is clicked
-          if(clickedAlbumCover){
+          if(playFromAlbumCover || htmlElement.attr("id") == undefined){
             // start with first track in album
             trackNum = "1";
 
@@ -267,7 +299,7 @@ export default {
           queueIndex = 0;
 
 
-          if(queue.queue.length > 0 && !clickedAlbumCover){
+          if(queue.queue.length > 0 && !playFromAlbumCover){
             trackNum = 1;  
             queue = getQueue(currTrackSRC,isShuffle,queue.queue);          
           }
@@ -282,7 +314,7 @@ export default {
           
 
           // currently playing track is highlighted
-          $(".track"+queue.queue[0]["order"]).attr("class","playing "+ defaultClass);
+          $("#track"+queue.queue[0]["order"]).attr("class","playing "+ defaultClass);
           //alert("t:"+trackNum + " vs q:" + queue.queue[0]["order"])
 
           // display currently playing track info in PlayBox
@@ -305,8 +337,8 @@ export default {
           // Display play button whenever track number is hovered over
           $("#controls"+trackNum).attr("class","trackNumber play");
           
-          
-          if($(this).attr("id").match("prev")){
+          var isPrev = $(this).attr("id").match("prev");
+          if(isPrev){
             // make current track the previous track in the queue
             queueIndex--;
           }
@@ -348,6 +380,15 @@ export default {
               queueIndex = 0;
               queue.queue = [];
               resetSideQueue();
+              playAlbumAutomatically = true;
+
+              if(isPrev){
+                showPrevAlbum();
+              }
+              else{
+                showNextAlbum();
+              }
+              
           }
         
       }
