@@ -1,9 +1,10 @@
 <template>
 
-  <div id="background"></div>
+  <div id="background">
+  </div>
+  <home-menu-view/>
   <side-queue/>  
   <album-view/>   
-  <!--PLAY BOX-->
   <play-box-view />
   <!-- <input type="file" ref="myfile">
   <button id="addButton" @click="upload">ADD</button> -->
@@ -16,13 +17,14 @@ import $ from 'jquery';
 import PlayBoxView from '@/components/PlayBoxView.vue';
 import AlbumView from '@/components/AlbumView.vue'
 import SideQueue from '@/components/SideQueue.vue';
+import HomeMenuView from '@/components/HomeMenuView.vue'
 import { storage } from "@/firebase/firebase"
 import {ref,listAll,getDownloadURL,getMetadata} from "firebase/storage"
 import "firebase/storage"
 
 export default {
   name: 'MainPageView',
-  components: {PlayBoxView,AlbumView,SideQueue},
+  components: {PlayBoxView,AlbumView,SideQueue,HomeMenuView},
   mounted(){
       
       let albumList = [];
@@ -131,45 +133,48 @@ export default {
 
       function showPrevAlbum(){
 
-          if(albumIndex != 0){
-            resetAlbum();
-            albumIndex -= 1;
-            albumTitle.text(albumList[albumIndex]);
-            buildTrackList(albumTitle.text());
-          }
-          
+        if(albumIndex != 0){
+          resetAlbum();
+          albumIndex -= 1;
+          albumTitle.text(albumList[albumIndex]);
+          buildTrackList(albumTitle.text());
         }
+        
+      }
 
       async function showNextAlbum(){
 
-          if(albumIndex < albumList.length -1){
-            resetAlbum()
-            albumIndex+=1;
-            albumTitle.text(albumList[albumIndex]);
-            await buildTrackList(albumTitle.text());
-          }
-          
+        if(albumIndex < albumList.length -1){
+          resetAlbum()
+          albumIndex+=1;
+          albumTitle.text(albumList[albumIndex]);
+          await buildTrackList(albumTitle.text());
         }
-
-      // function getCloudImages(){
         
-      //   const listRef = ref(storage, "images");
+      }
 
-      //   listAll(listRef).then((res) =>{
-    
-      //     //https://thumbs.gfycat.com/DisgustingSameAfricanfisheagle-size_restricted.gif
-      //     const image = res.items.find((imageRef) => imageRef.name.match("panda.gif"));
-      //     getDownloadURL(image).then((url) => {
-      //       $("#loadingScreen").attr("src",url);
-              
-      //     });
-      //     console.log(res.items)
-      //   }).catch((error) => {
-      //     // An error occurred
-      //     console.log(error);
-      //   });
+      function showIndicationOfCurrentlyPlayingAlbum(){
+        var listItems = document.getElementById("albumList").children;
+        
+        for(var i = 0; i < listItems.length; i++){
+          var albumListMenuItems = listItems[i].children;
+          for(var j = 0; j < albumListMenuItems.length; j++){
+            if(albumListMenuItems[j].classList.contains("albumPlaying")){
+              albumListMenuItems[j].classList.remove("albumPlaying"); 
+            }
+            if(albumListMenuItems[j].innerHTML == albumList[albumIndex]){
+              albumListMenuItems[j].classList.add("albumPlaying");
+            }
+            
+          }
+        }
+      }
 
-      // }
+      function addAlbumToMenu(albumName){
+        // adds an album to the home menu > albums
+        $("#albumList").append('<li><div class="menu-item">'+albumName+'</div></li>');
+      }
+
       async function getAlbums(){
 
         // get all folders in the root
@@ -180,6 +185,7 @@ export default {
           res.prefixes.forEach((folderRef) => {
             console.log("FOLDER NAME:"+folderRef.name)
             albumList.push(folderRef.name);
+            addAlbumToMenu(folderRef.name);
           });
         }).catch((error) => {
           // An error occurred
@@ -201,7 +207,7 @@ export default {
         const listRef = ref(storage, albumDirectory);
 
         await listAll(listRef).then((res) =>{
-
+buildTrackList
           var index = 0;
           res.items.forEach(async (songRef) => {          
             
@@ -254,7 +260,7 @@ export default {
           // $(".trackNumber").attr("class","trackNumber play");
           
           // previous track that was playing is unhighlighted (reset)
-          $(".playing").attr("class",defaultClass );
+          $(".trackPlaying").attr("class",defaultClass );
 
           // previous track that was playing has play button show
           // when hovered over (reset)
@@ -270,6 +276,8 @@ export default {
 
           // if album cover is clicked
           if(playFromAlbumCover || htmlElement.attr("id") == undefined){
+
+            //document.getElementById("albumList").children[0].children[0].classList.add("playing");
             // start with first track in album
             trackNum = "1";
 
@@ -287,7 +295,7 @@ export default {
           }
           
           musicPlayer.play();
-
+          showIndicationOfCurrentlyPlayingAlbum();
           
 
           // Display pause button whenever track Number is hovered over
@@ -314,7 +322,7 @@ export default {
           
 
           // currently playing track is highlighted
-          $("#track"+queue.queue[0]["order"]).attr("class","playing "+ defaultClass);
+          $("#track"+queue.queue[0]["order"]).attr("class","trackPlaying "+ defaultClass);
           //alert("t:"+trackNum + " vs q:" + queue.queue[0]["order"])
 
           // display currently playing track info in PlayBox
@@ -355,14 +363,14 @@ export default {
           // if queueIndex is within range of the queue
           if(queueIndex < queue.queue.length && queueIndex >= 0){
               // previous track that was playing is unhighlighted (reset)
-              $(".playing").attr("class",defaultClass);
+              $(".trackPlaying").attr("class",defaultClass);
 
               // play the next track in the queue
               musicPlayer.src = queue.queue[queueIndex].src;
               trackNum = queue.queue[queueIndex].order;
               musicPlayer.play();
 
-              $("#track"+trackNum).attr("class","playing " + defaultClass);
+              $("#track"+trackNum).attr("class","trackPlaying " + defaultClass);
 
               // Display pause button whenever track Number is hovered over
               $("#controls"+trackNum).attr("class","trackNumber pause");
@@ -374,7 +382,7 @@ export default {
           else{
               // reset PlayBox and queue
               musicPlayer.src = "";
-              $(".playing").attr("class",defaultClass );
+              $(".trackPlaying").attr("class",defaultClass );
               $("#songPlaying").text("");
               document.getElementById("displayAlbum").style.visibility = "hidden";
               queueIndex = 0;
@@ -392,32 +400,6 @@ export default {
           }
         
       }
-      // function playPrev(){          
-      //     queueIndex--;
-      //     if(queueIndex >= 0){
-      //         $(".playing").attr("class",defaultClass);
-      //         musicPlayer.src = queue[queueIndex].src;
-      //         trackNum = queue[queueIndex].trackNumber;
-      //         musicPlayer.play();
-
-      //         $("#track"+trackNum).attr("class","playing " + defaultClass);
-
-      //         //Display pause button whenever track Number is hovered over
-      //         $("#controls"+trackNum).attr("class","trackNumber pause");
-      //         $("#songPlaying").text($("#track"+trackNum).attr("display"));
-      //         $("#displayAlbum").attr("src",currAlbumCover.attr("src"));
-      //     }
-      //     else{
-      //         musicPlayer.src = "";
-      //         $(".playing").attr("class",defaultClass );
-      //         $("#songPlaying").text("");
-      //         //$("#displayAlbum").attr("src",require("../assets/Black_Box.png"));
-      //         document.getElementById("displayAlbum").style.visibility = "hidden";
-      //         queueIndex = 0;
-      //         queue = [];
-      //     }
-        
-      // }
 
       function resetAlbum(){
         document.getElementById("albumContainer").style.display = "none";
@@ -431,6 +413,7 @@ export default {
 
       function buildAlbum(album){
         
+        /* DOES NOTHING FOR NOW SINCE TRACKCONTAINER DNE RN */
         for(var i=0; i<currTrackList.length; i++){
             var tr = $('<div>');
             var song = currTrackList[i];
@@ -454,40 +437,21 @@ export default {
                 }
                 if(j==1){
                   td.text(song.name);
-                  // if(currTrackInfo != null && song.name == currTrackInfo.name){
-                  //   alert(song.name);
-                  //   tr.attr("class","tracks grid-container playing");
-                  //   queue = getQueue(currTrackInfo.src,isShuffle);
-                  // }
-                  // else{
-                  //   td.attr("class","songTitle");
-                  // }
                   td.attr("class","songTitle");
-                  
-
                 }
                 tr.append(td);
                 
             }
             album.append(tr);
         }
+
+        /* SHOWS ALBUM VIEW */
         document.getElementById("albumContainer").style.display = "block";
         document.getElementById("albumContainer").style.visibility = "visible";
         //document.getElementById("loadingScreen").style.display = "none";
         document.getElementById("lScreen").style.display = "none";
       }
 
-    //   <!-- <div class="sideQueue">
-    //     <label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>
-    //     <ul class="queueList">
-    //       <li>
-    //           <div class="tracks">Menu-1</div>
-    //       </li>
-    //       <li>
-    //           <div class="tracks">Menu-2</div>
-    //       </li>
-    //     </ul>
-    // </div> -->
       function resetSideQueue(){
         console.log("CHILDREN: "+sideQueue.children().length)
         if(sideQueue.children().length == 2){
@@ -495,19 +459,21 @@ export default {
             sideQueue.children()[0].remove();
           }
         }        
+
+        // close sideQueue
         document.getElementById("sideQueue").checked = false;
-        // if(isInitialization){
-        //   sideQueue.append('<label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>');
-        // }
+ 
       }
       function buildSideQueue(sideQueue){
         
         
         resetSideQueue();
+
+        // open sideQueue
         document.getElementById("sideQueue").checked = true;
         
         var ul = $("<ul>");
-        ul.attr("class","queueList");
+        ul.attr("class","listView");
         sideQueue.append('<label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>');
 
         for(var i=0; i<queue.queue.length; i++){
@@ -599,7 +565,6 @@ export default {
   background-image: url("../assets/background.jpg");
 } */
 #background{
-  /* position: fixed; */
   position: fixed;
   bottom: 0%;
   right: 0%;
@@ -610,11 +575,7 @@ export default {
   filter: blur(8px);
   -webkit-filter: blur(8px);  
 }
-.queueList{
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
+
 .tracks{
     max-width: 100%;
     max-height: 45px;
@@ -626,9 +587,11 @@ export default {
     opacity: 0.9;
     background-color: rgb(34, 34, 34);
 }
-.playing{
-    opacity: 0.9;
+.trackPlaying{
     background-color: rgb(195, 242, 174);
+}
+.albumPlaying{
+  background-color: rgb(195, 242, 174);
 }
 .grid-container {
   display: grid;
@@ -662,6 +625,13 @@ export default {
 } */
 /* .songTitle{
    text-align: justify;
+} */
+
+/* .grid{
+  height: 100%;
+  padding: auto;
+  display: grid;
+  grid-template-rows: 25% 25% 25% 25%;
 } */
 
 body, html {

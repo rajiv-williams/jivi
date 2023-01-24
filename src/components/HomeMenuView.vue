@@ -1,27 +1,36 @@
 <template>
-
-    <input type="checkbox" id="sideQueue" name="sideQueue" class="menu-checkbox">
-    <div class="sideQueue" id="sideQueueContainer">
-        <!-- <label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>
+    <input type="checkbox" id="homeMenu" name="homeMenu" class="menu-checkbox">
+    <div class="homeMenu" id="homeMenuContainer">
+        <label class="menu-toggle" for="homeMenu"><span>Toggle</span></label>
         <ul class="listView">
           <li>
-              <div class="tracks">Menu-1</div>
+              <label for="albumMenu" class="menu-item">ALBUMS</label>
+              <input type="checkbox" id="albumMenu" name="album-menu" class="menu-checkbox" checked>
+              <div class="homeMenu" id="albumMenuContainer">
+                  <label class="menu-toggle" for="albumMenu"><span>Toggle</span></label>
+                  <div>ALBUMS</div>
+                  <ul id="albumList" class="listView">
+                    <!-- Albums added from javascript go here -->
+                  </ul>
+              </div>
           </li>
           <li>
-              <div class="tracks">Menu-2</div>
+              <div class="menu-item">SOCIALS</div>
           </li>
-        </ul> -->
+        </ul>
     </div>
+  
 </template>
 
 <script>
+
 export default {
-    name: "SideQueue"
+  name: 'HomeMenuView'
 }
 </script>
 
+<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="sass">
-// CREDIT: https://codepen.io/anon/embed/JjJMwo?default-tab=result&height=500&slug-hash=chKqD&theme-id=1#html-box
 *
   margin: 0
   padding: 0
@@ -37,31 +46,40 @@ label
   &:focus
     outline: none
 
-.listView
-  list-style: none;
-  margin: 0;
-  padding: 0;
+// .albumPlaying
+//   background-color: rgb(195, 242, 174)
 
-.sideQueue
+.menu-item
+  max-width: 100%
+  max-height: 45px
+  background-color: black
+  font-size: 30px
+  color: white
+
+.menu-item:hover
+  color: rgb(222, 222, 222)
+  cursor: pointer
+    
+.homeMenu
   position: fixed
   top: 0
-  left: 0
+  right: 0
   background: #000
   width: 240px
   height: 100%
-  transform: translate3d(-240px, 0, 0)
+  transform: translate3d(0, 0, 0)
   transition: transform 0.35s
       
   label.menu-toggle  
     position: absolute    
-    right: -60px
+    left: -60px
     width: 60px
     height: 60px
     line-height: 0px    
     display: block
     padding: 0
     text-indent: -9999px
-    background: #fff url(https://cdn4.iconfinder.com/data/icons/wirecons-free-vector-icons/32/menu-alt-512.png) 50% 50% / 25px 25px no-repeat
+    background: #fff url(https://cdn0.iconfinder.com/data/icons/typicons-2/24/home-1024.png) 50% 50% / 25px 25px no-repeat
     border:  1px solid black
     border-collapse: collapse
     box-shadow: 1px 1px black
@@ -83,12 +101,12 @@ label
   display: grid
 
 /* hide navigation icon for sublabels */    
-.sideQueue .sideQueue label.menu-toggle
+.homeMenu .homeMenu label.menu-toggle
   background: none
     
 /* fade in checked menu */    
-.menu-checkbox:checked + .sideQueue
-  transform: translate3d(0, 0, 0)
+.menu-checkbox:checked + .homeMenu
+  transform: translate3d(240px, 0, 0)
 
     
     
