@@ -8,7 +8,7 @@
               <input type="checkbox" id="albumMenu" name="album-menu" class="menu-checkbox" checked>
               <div class="homeMenu" id="albumMenuContainer">
                   <label class="menu-toggle" for="albumMenu"><span>Toggle</span></label>
-                  <div>ALBUMS</div>
+                  <div class="menu-title">ALBUMS</div>
                   <ul id="albumList" class="listView">
                     <!-- Albums added from javascript go here -->
                   </ul>
@@ -49,6 +49,30 @@ label
 // .albumPlaying
 //   background-color: rgb(195, 242, 174)
 
+.menu-title
+  max-width: 100%
+  max-height: 45px
+  font-size: 30px
+  color: rgb(229, 185, 255)
+  font-weight: bold
+  border-bottom: 1px solid white
+  border-collapse: collapse
+  text-shadow: -1px -1px 0 #fff, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000
+  letter-spacing: 5px
+
+.albumMenuItem
+  max-width: 100%
+  max-height: 45px
+  background-color: black
+  font-size: 30px
+  color: white
+  padding: auto
+
+.albumMenuItem:hover
+  color: rgb(222, 222, 222)
+  background-color: rgba(229, 185, 255, 0.201)
+  cursor: pointer
+
 .menu-item
   max-width: 100%
   max-height: 45px
@@ -65,7 +89,7 @@ label
   top: 0
   right: 0
   background: #000
-  width: 240px
+  width: 300px
   height: 100%
   transform: translate3d(0, 0, 0)
   transition: transform 0.35s
@@ -106,7 +130,7 @@ label
     
 /* fade in checked menu */    
 .menu-checkbox:checked + .homeMenu
-  transform: translate3d(240px, 0, 0)
+  transform: translate3d(300px, 0, 0)
 
     
     

@@ -28,7 +28,8 @@ export default {
   mounted(){
       
       let albumList = [];
-      let trackContainer = $("#albumTrackContainer");
+      let albumListElement = $("#albumList");
+      // let trackContainer = $("#albumTrackContainer");
       //let currAlbumCover = $("#albumCover");
       let currTrackList = [];
       let currTrackSRC = null;
@@ -56,8 +57,7 @@ export default {
 
         //TODO: INCLUDE IN README, PROGRAM WORKS BEST IN CHROME
         //getCloudImages();
-        await getAlbums();
-        buildTrackList(albumTitle.text());
+        loadFirebaseData();
         // initialize Shuffle button
         shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
         $(".playButton").attr("src",require("../assets/PLAY_BUTTON.png"))
@@ -131,8 +131,12 @@ export default {
 
       });
 
-      function showPrevAlbum(){
+      async function loadFirebaseData(){
+        await getAlbums();
+        buildTrackList(albumTitle.text());
+      }
 
+      function showPrevAlbum(){
         if(albumIndex != 0){
           resetAlbum();
           albumIndex -= 1;
@@ -142,13 +146,13 @@ export default {
         
       }
 
-      async function showNextAlbum(){
-
+      function showNextAlbum(){
+        
         if(albumIndex < albumList.length -1){
           resetAlbum()
           albumIndex+=1;
           albumTitle.text(albumList[albumIndex]);
-          await buildTrackList(albumTitle.text());
+          buildTrackList(albumTitle.text());
         }
         
       }
@@ -158,13 +162,29 @@ export default {
         
         for(var i = 0; i < listItems.length; i++){
           var albumListMenuItems = listItems[i].children;
+          var albumVinyl = null;
           for(var j = 0; j < albumListMenuItems.length; j++){
-            if(albumListMenuItems[j].classList.contains("albumPlaying")){
-              albumListMenuItems[j].classList.remove("albumPlaying"); 
+
+            // First element in children
+            // if(albumListMenuItems[j].classList.contains("vinylContainer")){
+            //   albumVinyl = albumListMenuItems[j].children[0];  
+            // }
+
+            albumVinyl = albumListMenuItems[j].children[0];
+
+            // Reset previous album playing
+            if(albumListMenuItems[j].classList.contains("albumPlaying") && albumVinyl!=null){
+              albumListMenuItems[j].classList.remove("albumPlaying");
+              albumVinyl.setAttribute("src",""); 
             }
-            if(albumListMenuItems[j].innerHTML == albumList[albumIndex]){
+
+            if(albumListMenuItems[j].innerText == albumList[albumIndex] && albumVinyl!=null){
               albumListMenuItems[j].classList.add("albumPlaying");
-            }
+
+              // make this shown as the currently playing album
+              albumVinyl.setAttribute("src",require("../assets/vinyl.gif"));
+            }      
+            
             
           }
         }
@@ -172,7 +192,12 @@ export default {
 
       function addAlbumToMenu(albumName){
         // adds an album to the home menu > albums
-        $("#albumList").append('<li><div class="menu-item">'+albumName+'</div></li>');
+        albumListElement.append(
+          '<li>'+
+            // '<div class="vinylContainer grid-container"></div>'+
+            '<div class="albumMenuItem"><img class="vinyl" src="">'+albumName+'</div>'+
+          '</li>'
+        );
       }
 
       async function getAlbums(){
@@ -207,7 +232,7 @@ export default {
         const listRef = ref(storage, albumDirectory);
 
         await listAll(listRef).then((res) =>{
-buildTrackList
+
           var index = 0;
           res.items.forEach(async (songRef) => {          
             
@@ -230,7 +255,8 @@ buildTrackList
 
                     // HIDE CIRCULAR PROGRESS INDICATOR
 
-                    buildAlbum(trackContainer);
+                    // buildAlbum(trackContainer);
+                    buildAlbum();
 
                     if(playAlbumAutomatically){
                       playTrack();
@@ -294,8 +320,8 @@ buildTrackList
             musicPlayer.src = currTrackSRC;
           }
           
-          musicPlayer.play();
-          showIndicationOfCurrentlyPlayingAlbum();
+          
+          
           
 
           // Display pause button whenever track Number is hovered over
@@ -306,7 +332,7 @@ buildTrackList
           // initialize queue index to first song in queue
           queueIndex = 0;
 
-
+          // if you pressed on the queue itself, generate a new queue based on theh queue
           if(queue.queue.length > 0 && !playFromAlbumCover){
             trackNum = 1;  
             queue = getQueue(currTrackSRC,isShuffle,queue.queue);          
@@ -315,7 +341,10 @@ buildTrackList
             queue = getQueue(currTrackSRC,isShuffle,currTrackList);
           }
 
-          
+          currTrackSRC = queue.queue[0].src;
+          musicPlayer.src = currTrackSRC;
+          musicPlayer.play();
+          showIndicationOfCurrentlyPlayingAlbum();
           buildSideQueue(sideQueue);      
           
           //alert(currTrackSRC)
@@ -401,6 +430,13 @@ buildTrackList
         
       }
 
+      // function deleteChildren(element){
+      //   var numChildren = element.children().length;
+      //   for(var i=0; i<numChildren; i++){
+      //       element.children()[0].remove();        
+      //   }
+      // }
+
       function resetAlbum(){
         document.getElementById("albumContainer").style.display = "none";
         //document.getElementById("loadingScreen").style.display = "block";
@@ -411,44 +447,43 @@ buildTrackList
         // queue = [];
       }
 
-      function buildAlbum(album){
+      function buildAlbum(){
         
         /* DOES NOTHING FOR NOW SINCE TRACKCONTAINER DNE RN */
-        for(var i=0; i<currTrackList.length; i++){
-            var tr = $('<div>');
-            var song = currTrackList[i];
+        // for(var i=0; i<currTrackList.length; i++){
+        //     var tr = $('<div>');
+        //     var song = currTrackList[i];
             
 
-            // var songName = path.parse(songPath).name;
-            // tr.attr('id', 'track' + (i+1));
-            tr.attr("src",song.src);
-            tr.attr("display", song.name + " - " + "RAJIV");
-            tr.attr("class","tracks grid-container");
-            tr.click(playTrack);
+        //     // var songName = path.parse(songPath).name;
+        //     // tr.attr('id', 'track' + (i+1));
+        //     tr.attr("src",song.src);
+        //     tr.attr("display", song.name + " - " + "RAJIV");
+        //     tr.attr("class","tracks grid-container");
+        //     tr.click(playTrack);
             
-            for(var j=0; j<2; j++){
-                var td = $('<b>');
-                td.attr("style","color: white;");
-                if(j==0){
-                  //print number of track in album
-                  td.text(i+1);
-                  td.attr("id","controls"+(i+1));
-                  td.attr("class","trackNumber play");
-                }
-                if(j==1){
-                  td.text(song.name);
-                  td.attr("class","songTitle");
-                }
-                tr.append(td);
+        //     for(var j=0; j<2; j++){
+        //         var td = $('<b>');
+        //         td.attr("style","color: white;");
+        //         if(j==0){
+        //           //print number of track in album
+        //           td.text(i+1);
+        //           td.attr("id","controls"+(i+1));
+        //           td.attr("class","trackNumber play");
+        //         }
+        //         if(j==1){
+        //           td.text(song.name);
+        //           td.attr("class","songTitle");
+        //         }
+        //         tr.append(td);
                 
-            }
-            album.append(tr);
-        }
+        //     }
+        //     album.append(tr);
+        // }
 
         /* SHOWS ALBUM VIEW */
         document.getElementById("albumContainer").style.display = "block";
         document.getElementById("albumContainer").style.visibility = "visible";
-        //document.getElementById("loadingScreen").style.display = "none";
         document.getElementById("lScreen").style.display = "none";
       }
 
@@ -530,14 +565,14 @@ buildTrackList
           //when shuffle is on
           if(isShuffle){
               var ignoredIndexes = [];
-              for(i = 0; i < tracklist.length; i++){
-                  //add current track to the front of the start of the queue
-                  if(tracklist[i].src == currTrackPath){
-                    queue.queue.push({"src":tracklist[i].src,"order":queue.queue.length+1,"name":tracklist[i].name});
-                      ignoredIndexes.push(i);
-                      break;
-                  }
-              }
+              // for(i = 0; i < tracklist.length; i++){
+              //     //add current track to the front of the start of the queue
+              //     if(tracklist[i].src == currTrackPath){
+              //       queue.queue.push({"src":tracklist[i].src,"order":queue.queue.length+1,"name":tracklist[i].name});
+              //         ignoredIndexes.push(i);
+              //         break;
+              //     }
+              // }
               
           
               while(queue.queue.length < tracklist.length){
@@ -575,6 +610,9 @@ buildTrackList
   filter: blur(8px);
   -webkit-filter: blur(8px);  
 }
+#albumList{
+ top: 0; 
+}
 
 .tracks{
     max-width: 100%;
@@ -588,14 +626,23 @@ buildTrackList
     background-color: rgb(34, 34, 34);
 }
 .trackPlaying{
-    background-color: rgb(195, 242, 174);
+    background-color: rgba(218, 174, 242, 0.301);
 }
 .albumPlaying{
-  background-color: rgb(195, 242, 174);
+  background-color: rgb(23, 23, 23);
+  text-align: left;
+  border: 1px dashed rgb(18, 18, 18) ;
+  border-collapse: collapse;
+}
+.vinyl{
+  width: 15%;
+
 }
 .grid-container {
+  background-color: red;
   display: grid;
-  grid-template-columns: 20% 70% 10%;
+  grid-template-columns: auto auto;
+
 }
 .trackNumber{
   text-align: left;
