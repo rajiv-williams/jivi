@@ -64,6 +64,9 @@ export default {
         shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
         $(".playButton").attr("src",require("../assets/PLAY_BUTTON.png"))
         $(".jivi_logo").attr("src",require("../assets/JIVI_LOGO.png"))
+        $("#instagramLogo").attr("src",require("../assets/IG.png"))
+        $("#youtubeLogo").attr("src",require("../assets/YT.png"))
+        $("#linkedinLogo").attr("src",require("../assets/IN.png"))
 
 
         // --- Event Listeners ---
@@ -106,6 +109,21 @@ export default {
           }
           else{
             albumMenuIcon.style.display = "block";
+          }
+        })
+
+        var socialToggleMenu = document.getElementById("socialMenu");
+        var socialMenuIcon = document.getElementById("socialMenuIcon");
+
+        if(socialToggleMenu.checked){
+            socialMenuIcon.style.display = "none";
+        }
+        socialToggleMenu.addEventListener('change', function(){
+          if(this.checked){
+            socialMenuIcon.style.display = "none";
+          }
+          else{
+            socialMenuIcon.style.display = "block";
           }
         })
 
@@ -430,7 +448,7 @@ export default {
         //alert("t:"+trackNum + " vs q:" + queue.queue[0]["order"])
 
         // display currently playing track info in PlayBox
-        $("#songPlaying").text(queue.queue[0].name);
+        $("#songPlaying").text(queue.queue[0].name + " - RAJIV");
         document.getElementById("displayAlbum").style.visibility = "visible";
         $("#displayAlbum").attr("src",queue.albumCoverSRC);
 
@@ -480,7 +498,7 @@ export default {
               $("#controls"+trackNum).attr("class","trackNumber pause");
 
               // display currently playing track info in PlayBox
-              $("#songPlaying").text(queue.queue[queueIndex].name);
+              $("#songPlaying").text(queue.queue[queueIndex].name + " - RAJIV");
               $("#displayAlbum").attr("src",queue.albumCoverSRC);
           }
           else{

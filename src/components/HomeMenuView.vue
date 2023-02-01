@@ -6,7 +6,7 @@
           <img class="jivi_logo" src="">
           <li>
               <label for="albumMenu" class="menu-item">ALBUMS</label>
-              <input type="checkbox" id="albumMenu" name="album-menu" class="menu-checkbox" checked>
+              <input type="checkbox" id="albumMenu" name="album-menu" class="menu-checkbox sub-menu-checkbox" checked>
               <div class="homeMenu" id="albumMenuContainer">
                   <label class="menu-toggle" id="albumMenuIcon" for="albumMenu"><span>Toggle</span></label>
                   <div class="menu-title">ALBUMS</div>
@@ -16,7 +16,33 @@
               </div>
           </li>
           <li>
-              <div class="menu-item">SOCIALS</div>
+              <!-- <div class="menu-item">SOCIALS</div> -->
+              <label for="socialMenu" class="menu-item">SOCIALS</label>
+              <input type="checkbox" id="socialMenu" name="social-menu" class="menu-checkbox sub-menu-checkbox" checked>
+              <div class="homeMenu" id="albumMenuContainer">
+                  <label class="menu-toggle" id="socialMenuIcon" for="socialMenu"><span>Toggle</span></label>
+                  <div class="menu-title">SOCIALS</div>
+                  <ul id="albumList" class="listView">
+                    <li>
+                      <div class="socialMenuItem">
+                        <img class="socialLogo" id="instagramLogo" src="" alt="Instagram">
+                        <a href="https://www.instagram.com/produceraw/">@produceraw</a>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="socialMenuItem">
+                        <img class="socialLogo" id="youtubeLogo" src="" alt="YouTube">
+                        <a href="https://www.youtube.com/@producerraw7497">PRODUCER RAW</a>
+                      </div>
+                    </li>
+                    <li>
+                      <div class="socialMenuItem">
+                        <img class="socialLogo" id="linkedinLogo" src="" alt="LinkedIN">
+                        <a href="https://www.linkedin.com/in/rajiv-williams/">Rajiv Williams</a>
+                      </div>
+                    </li>
+                  </ul>
+              </div>
           </li>
         </ul>
     </div>
@@ -65,7 +91,22 @@ label
   text-shadow: -1px -1px 0 #fff, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000
   letter-spacing: 5px
 
-.albumMenuItem
+.socialLogo
+  width: 40px
+  height: 40px
+  margin: auto
+  padding: 5px
+
+.socialMenuItem
+  max-width: 100%
+  max-height: 45px
+  background-color: black
+  font-size: 20px
+  color: white
+  padding: auto
+  display: grid
+  grid-template-columns: 10% 90%;
+.albumMenuItem 
   max-width: 100%
   max-height: 45px
   background-color: black
