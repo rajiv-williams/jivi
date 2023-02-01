@@ -1,5 +1,5 @@
 <template>
-    <h1 class="albumTitle">ALBUM TITLE</h1>
+    <!-- <h1 class="albumTitle">ALBUM TITLE</h1> -->
     <div id="albumNavigation">
       <p id="leftArrow" class="navigation"></p>
         <div id="albumContainer" class="playable">

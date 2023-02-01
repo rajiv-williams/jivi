@@ -3,11 +3,12 @@
     <div class="homeMenu" id="homeMenuContainer">
         <label class="menu-toggle" for="homeMenu"><span>Toggle</span></label>
         <ul class="listView">
+          <img class="jivi_logo" src="">
           <li>
               <label for="albumMenu" class="menu-item">ALBUMS</label>
               <input type="checkbox" id="albumMenu" name="album-menu" class="menu-checkbox" checked>
               <div class="homeMenu" id="albumMenuContainer">
-                  <label class="menu-toggle" for="albumMenu"><span>Toggle</span></label>
+                  <label class="menu-toggle" id="albumMenuIcon" for="albumMenu"><span>Toggle</span></label>
                   <div class="menu-title">ALBUMS</div>
                   <ul id="albumList" class="listView">
                     <!-- Albums added from javascript go here -->
@@ -49,6 +50,10 @@ label
 // .albumPlaying
 //   background-color: rgb(195, 242, 174)
 
+.jivi_logo
+  width: 100%
+  position:absolute
+
 .menu-title
   max-width: 100%
   max-height: 45px
@@ -89,7 +94,7 @@ label
   top: 0
   right: 0
   background: #000
-  width: 300px
+  width: 240px
   height: 100%
   transform: translate3d(0, 0, 0)
   transition: transform 0.35s
@@ -130,7 +135,7 @@ label
     
 /* fade in checked menu */    
 .menu-checkbox:checked + .homeMenu
-  transform: translate3d(300px, 0, 0)
+  transform: translate3d(240px, 0, 0)
 
     
     

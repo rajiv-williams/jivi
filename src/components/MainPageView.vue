@@ -40,7 +40,7 @@ export default {
       let isShuffle = false;
       let shuffleButton = $("#shuffleButton");
       // let shuffleButton = document.getElementById("shuffleButton")
-      let queue = {"queue":[],"albumCoverSRC":""};
+      let queue = {"queue":[],"albumCoverSRC":"","albumIndex":0};
       //let queue = [];
       let queueIndex = 0;
       let musicPlayer = document.getElementById("musicPlayer");
@@ -55,138 +55,158 @@ export default {
       
       $(document).ready(async function(){
 
-        //TODO: INCLUDE IN README, PROGRAM WORKS BEST IN CHROME
-        //getCloudImages();
+        // --- Initialization ---
+
+        // Database for Music
         loadFirebaseData();
-        // initialize Shuffle button
+
+        // Images 
         shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
         $(".playButton").attr("src",require("../assets/PLAY_BUTTON.png"))
-        /*
-        ---COMPLETED---
-          TODO: 
-            +Write code to dynamically build table of first album's track list
-            +Make track list playable
-            +Make right and left arrows functional to switch between each album using albumIndex (+/-)
-            +Make it so only one album is shown at a time with css
-        */
+        $(".jivi_logo").attr("src",require("../assets/JIVI_LOGO.png"))
 
-        //EVERY TIME AN ALBUM IS SELECTED REPEAT THIS ENTIRE THING BELOW
-        //HAVE AN EVENT HANDLER FOR WHEN A NEXT ARROW IS CLICKED
-        //REMEMBER WHERE IN THE LIST OF ALBUMS YOU ARE        
 
+        // --- Event Listeners ---
+
+        // Album Navigation
         $("#leftArrow").click(showPrevAlbum);
         $("#rightArrow").click(showNextAlbum);
 
+        // When an album cover is clicked, play the tracks in the album
+        $("#albumCover").click(playTrack);
+
+        // Queue Navigation
+        $("#nextButton").click(playNextOrPrev);      
+        $("#prevButton").click(playNextOrPrev); 
+
+        // Shuffle Toggling
         shuffleButton.click(function(){
           if(!songIsPlaying){
-            if(isShuffle){
-              isShuffle = false;
-              shuffleButton.text("SHUFFLE OFF");
-              shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
-            }
-            else{
-              isShuffle = true;
-              shuffleButton.text("SHUFFLE ON");
-              // document.getElementById("shuffleButton").style.backgroundImage = "url("+ imagePath2 +")";
-              shuffleButton.attr("src",require("../assets/SHUFFLE_ON.png"));
-            }
+            isShuffle = !isShuffle;
+            toggleShuffleStyling();
           }
         }); 
      
         shuffleButton.hover(function(){
           shuffleButton.attr("src",require("../assets/SHUFFLE_H.png"));
-        },function(){
-          if(isShuffle){
-            shuffleButton.attr("src",require("../assets/SHUFFLE_ON.png"));
+        },toggleShuffleStyling)  
+
+
+        // [TEMPORARY FIX] 
+        // fix styling with button so it doesn't display over "jivi" logo
+        var albumToggleMenu = document.getElementById("albumMenu")
+        var albumMenuIcon = document.getElementById("albumMenuIcon");
+
+        if(albumToggleMenu.checked){
+            albumMenuIcon.style.display = "none";
+        }
+        albumToggleMenu.addEventListener('change', function(){
+          if(this.checked){
+            albumMenuIcon.style.display = "none";
           }
           else{
-            shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
-          } 
-        })  
+            albumMenuIcon.style.display = "block";
+          }
+        })
 
+        // Whenever you hover a playable element like an album, playlist, etc
+        // it shows a play button as an overlay
         $(".playable").hover(function(){
+          // get children of this playable element
           var children = document.getElementById($(this).attr("id")).children;
           console.log(children.length)
-          // show play button overlay
+          
           for(var i = 0; i < children.length; i++){
+            // get the element where the image of the overlay is
             if(children[i].className != null && children[i].className.match("playButton")){
-              //alert("test")
+              // show play button overlay
               children[i].style.display = "block";
             }
           }
         }, function(){
           var children = document.getElementById($(this).attr("id")).children;
-          // show play button overlay
+          
           for(var i = 0; i < children.length; i++){
             if(children[i].className != null && children[i].className.match("playButton")){
+              // hide play button overlay
               children[i].style.display = "none";
             }
           }
         })
-
-        $("#nextButton").click(playNextOrPrev);      
-        $("#prevButton").click(playNextOrPrev);   
-        
-        $("#albumCover").click(playTrack);
-
       });
 
+      /**
+       * Function toggles the shuffle button's styling
+       */
+      function toggleShuffleStyling(){
+        if(isShuffle){   
+          shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
+        }
+        else{
+          shuffleButton.attr("src",require("../assets/SHUFFLE_ON.png"));
+        }
+      }
+
+      /**
+       * Initially loads albums and builds initial tracklist
+       * from Firebase Cloud Storage
+       */
       async function loadFirebaseData(){
         await getAlbums();
-        buildTrackList(albumTitle.text());
+        buildTrackList(albumList[albumIndex]);
+
+        // after albums are loaded, make them clickable
+        $(".albumMenuItem").click(playAlbum);
       }
 
+      /**
+       * When an album is clicked, its album name is noted
+       * and it searches the album list to play the album's
+       * track list
+       */
+      function playAlbum(){
+
+        var albumName = $(this).text();
+        // find out if album being played is to the left or right of current album
+
+        // find new album index
+        for(var i =0; i < albumList.length; i++){
+          if(albumList[i] == albumName){
+            albumIndex = i;
+          }
+        }
+
+        playAlbumAutomatically = true;
+        switchAlbum();
+        
+      }
+
+      /**
+       * Resets the album view, then displays the album at the current album index
+       */
+      function switchAlbum(){
+        resetAlbum();
+        albumTitle.text(albumList[albumIndex]);
+        buildTrackList(albumList[albumIndex]);
+      }
+
+      /**
+       * Decrements album index, then switches to that album
+       */
       function showPrevAlbum(){
         if(albumIndex != 0){
-          resetAlbum();
           albumIndex -= 1;
-          albumTitle.text(albumList[albumIndex]);
-          buildTrackList(albumTitle.text());
+          switchAlbum();
         }
-        
       }
 
+      /**
+       * Increments album index, then switches to that album
+       */
       function showNextAlbum(){
-        
         if(albumIndex < albumList.length -1){
-          resetAlbum()
-          albumIndex+=1;
-          albumTitle.text(albumList[albumIndex]);
-          buildTrackList(albumTitle.text());
-        }
-        
-      }
-
-      function showIndicationOfCurrentlyPlayingAlbum(){
-        var listItems = document.getElementById("albumList").children;
-        
-        for(var i = 0; i < listItems.length; i++){
-          var albumListMenuItems = listItems[i].children;
-          var albumVinyl = null;
-          for(var j = 0; j < albumListMenuItems.length; j++){
-
-            // First element in children
-            // if(albumListMenuItems[j].classList.contains("vinylContainer")){
-            //   albumVinyl = albumListMenuItems[j].children[0];  
-            // }
-
-            albumVinyl = albumListMenuItems[j].children[0];
-
-            // Reset previous album playing
-            if(albumListMenuItems[j].classList.contains("albumPlaying") && albumVinyl!=null){
-              albumListMenuItems[j].classList.remove("albumPlaying");
-              albumVinyl.setAttribute("src",""); 
-            }
-
-            if(albumListMenuItems[j].innerText == albumList[albumIndex] && albumVinyl!=null){
-              albumListMenuItems[j].classList.add("albumPlaying");
-
-              // make this shown as the currently playing album
-              albumVinyl.setAttribute("src",require("../assets/vinyl.gif"));
-            }      
-            
-            
-          }
+          albumIndex += 1;
+          switchAlbum();
         }
       }
 
@@ -200,37 +220,91 @@ export default {
         );
       }
 
+      /**
+       * While the current album is playing, it shows a vinyl .gif
+       * next to the album name in the album menu
+       */
+      function showIndicationOfCurrentlyPlayingAlbum(){
+
+        /**
+         * gets album list items in album menu (this element is dynamically 
+         * appended to in addAlbumToMenu() function)
+         * 
+         * essentially gets all the <li>
+         */
+        var listItems = document.getElementById("albumList").children;
+        
+        for(var i = 0; i < listItems.length; i++){
+
+          // gets all the <div>'s in the current <li>
+          var albumListMenuItems = listItems[i].children;
+          var albumVinyl = null;
+
+          for(var j = 0; j < albumListMenuItems.length; j++){
+
+            // gets the <img> in the current <div>
+            albumVinyl = albumListMenuItems[j].children[0];
+
+            // Reset previous album playing
+            if(albumListMenuItems[j].classList.contains("albumPlaying") && albumVinyl!=null){
+              albumListMenuItems[j].classList.remove("albumPlaying");
+              albumVinyl.setAttribute("src",""); 
+            }
+
+            // Set the current album playing
+            if(albumListMenuItems[j].innerText == albumList[queue.albumIndex] && albumVinyl!=null){
+              albumListMenuItems[j].classList.add("albumPlaying");
+              albumVinyl.setAttribute("src",require("../assets/vinyl.gif"));
+            }      
+  
+          }
+        }
+      }
+
+      /**
+       * Get all album names from Firebase Storage in order to
+       * retrieve their information.
+       * 
+       * REFERENCE: https://firebase.google.com/docs/storage/web/list-files
+       */
       async function getAlbums(){
 
-        // get all folders in the root
+        // get all folders in the root of the bucket on Firebase Storage
         const listRef = ref(storage, "");
 
         await listAll(listRef).then((res) =>{
 
           res.prefixes.forEach((folderRef) => {
-            console.log("FOLDER NAME:"+folderRef.name)
             albumList.push(folderRef.name);
             addAlbumToMenu(folderRef.name);
+            console.log("Successfully loaded '"+folderRef.name+"' to album list.")
           });
         }).catch((error) => {
           // An error occurred
           console.log(error);
         });
 
+        // Initialize album title to first album in album list
         if(albumList.length > 0){
           albumTitle.text(albumList[0]);
         }
 
       }
-      //https://firebase.google.com/docs/storage/web/list-files
+      
+      /**
+       * Get all album tracks and album cover from Firebase Storage
+       * 
+       * REFERENCE: https://firebase.google.com/docs/storage/web/list-files
+       */
       async function buildTrackList(albumDirectory){
 
-        // SHOW CIRCULAR PROGRESS INDICATOR
+        //TODO: SHOW CIRCULAR PROGRESS INDICATOR
 
         currTrackList = [];
         
         const listRef = ref(storage, albumDirectory);
 
+        // list all songs in albumDirectory
         await listAll(listRef).then((res) =>{
 
           var index = 0;
@@ -245,24 +319,25 @@ export default {
                     currTrackList.push({"src":url,"name":songName,"order":index+1});
                   }
                   else{
+                    // set album cover
                     $("#albumCover").attr("src",url);
                     albumCoverSRC = url;
+
+                    // set background as album cover
                     document.getElementById("background").style.backgroundImage = "url("+url+")";
                   }
                   
                   if(res.items.length > 0 && res.items.length - 1 == index){
-                    console.log("SONGS MainPage: "+currTrackList);
 
-                    // HIDE CIRCULAR PROGRESS INDICATOR
+                    //TODO: HIDE CIRCULAR PROGRESS INDICATOR
 
-                    // buildAlbum(trackContainer);
                     buildAlbum();
 
                     if(playAlbumAutomatically){
                       playTrack();
                       playAlbumAutomatically = false;
                     }
-                    console.log(url);
+ 
                   }
                   index += 1;
                 })
@@ -280,87 +355,87 @@ export default {
 
       }
 
+      /**
+       * Plays track based on many different contexts:
+       * 
+       * -whether you play from an album cover
+       * -whether you play from the queue
+       * -etc.
+       */
       function playTrack(){
 
-          // reset of symbol displayed when you hover over track number
-          // $(".trackNumber").attr("class","trackNumber play");
-          
-          // previous track that was playing is unhighlighted (reset)
-          $(".trackPlaying").attr("class",defaultClass );
+        // reset of symbol displayed when you hover over track number
+        // $(".trackNumber").attr("class","trackNumber play");
+        
+        // previous track that was playing is unhighlighted (reset)
+        $(".trackPlaying").attr("class",defaultClass );
 
-          // previous track that was playing has play button show
-          // when hovered over (reset)
-          $("#controls"+trackNum).attr("class","trackNumber play");
+        // previous track that was playing has play button show
+        // when hovered over (reset)
+        $("#controls"+trackNum).attr("class","trackNumber play");
 
-          var htmlElement = $(this);
+        var htmlElement = $(this);
 
-          // play all tracks from when you open the album
-          var playFromAlbumCover = true; 
-          if(htmlElement.attr("id") != undefined){
-            playFromAlbumCover = htmlElement.attr("id").match("albumCover");
-          }      
+        // play all tracks from when you open the album
+        var playFromAlbumCover = true; 
+        if(htmlElement.attr("id") != undefined){
+          playFromAlbumCover = htmlElement.attr("id").match("albumCover");
+        }      
 
-          // if album cover is clicked
-          if(playFromAlbumCover || htmlElement.attr("id") == undefined){
+        // if album cover is clicked
+        if(playFromAlbumCover || htmlElement.attr("id") == undefined){
 
-            //document.getElementById("albumList").children[0].children[0].classList.add("playing");
-            // start with first track in album
-            trackNum = "1";
+          //document.getElementById("albumList").children[0].children[0].classList.add("playing");
+          // start with first track in album
+          trackNum = "1";
 
-            // change music player to current track
-            currTrackSRC = currTrackList[parseInt(trackNum)-1].src;
-            //alert(currTrackList[parseInt(trackNum)-1].name)
-            musicPlayer.src = currTrackSRC;
-          }
-          // if an actual track is clicked
-          else{
-            trackNum = htmlElement.attr("id").split("track")[1];
-
-            currTrackSRC = htmlElement.attr("src");
-            musicPlayer.src = currTrackSRC;
-          }
-          
-          
-          
-          
-
-          // Display pause button whenever track Number is hovered over
-          $("#controls"+trackNum).attr("class","trackNumber pause");
-
-          console.log("CURRENT SONG: " + musicPlayer.getAttribute("src"))
-          
-          // initialize queue index to first song in queue
-          queueIndex = 0;
-
-          // if you pressed on the queue itself, generate a new queue based on theh queue
-          if(queue.queue.length > 0 && !playFromAlbumCover){
-            trackNum = 1;  
-            queue = getQueue(currTrackSRC,isShuffle,queue.queue);          
-          }
-          else{
-            queue = getQueue(currTrackSRC,isShuffle,currTrackList);
-          }
-
-          currTrackSRC = queue.queue[0].src;
+          // change music player to current track
+          currTrackSRC = currTrackList[parseInt(trackNum)-1].src;
+          //alert(currTrackList[parseInt(trackNum)-1].name)
           musicPlayer.src = currTrackSRC;
-          musicPlayer.play();
-          showIndicationOfCurrentlyPlayingAlbum();
-          buildSideQueue(sideQueue);      
-          
-          //alert(currTrackSRC)
-          
+        }
+        // if an actual track is clicked
+        else{
+          trackNum = htmlElement.attr("id").split("track")[1];
 
-          // currently playing track is highlighted
-          $("#track"+queue.queue[0]["order"]).attr("class","trackPlaying "+ defaultClass);
-          //alert("t:"+trackNum + " vs q:" + queue.queue[0]["order"])
+          currTrackSRC = htmlElement.attr("src");
+          musicPlayer.src = currTrackSRC;
+        }
+        
+        // Display pause button whenever track Number is hovered over
+        $("#controls"+trackNum).attr("class","trackNumber pause");
 
-          // display currently playing track info in PlayBox
-          $("#songPlaying").text(queue.queue[0].name);
-          document.getElementById("displayAlbum").style.visibility = "visible";
-          $("#displayAlbum").attr("src",queue.albumCoverSRC);
+        console.log("CURRENT SONG: " + musicPlayer.getAttribute("src"))
+        
+        // initialize queue index to first song in queue
+        queueIndex = 0;
 
-          // play next track by default
-          musicPlayer.onended = playNextOrPrev;
+        // if you pressed on the queue itself, generate a new queue based on theh queue
+        if(queue.queue.length > 0 && !playFromAlbumCover){
+          trackNum = 1;  
+          queue = getQueue(currTrackSRC,isShuffle,queue.queue);          
+        }
+        else{
+          queue = getQueue(currTrackSRC,isShuffle,currTrackList);
+        }
+
+        currTrackSRC = queue.queue[0].src;
+        musicPlayer.src = currTrackSRC;
+        musicPlayer.play();
+        showIndicationOfCurrentlyPlayingAlbum();
+        buildSideQueue(sideQueue);      
+        
+        // currently playing track is highlighted
+        $("#track"+queue.queue[0]["order"]).attr("class","trackPlaying "+ defaultClass);
+        //alert("t:"+trackNum + " vs q:" + queue.queue[0]["order"])
+
+        // display currently playing track info in PlayBox
+        $("#songPlaying").text(queue.queue[0].name);
+        document.getElementById("displayAlbum").style.visibility = "visible";
+        $("#displayAlbum").attr("src",queue.albumCoverSRC);
+
+        // play next track by default
+        musicPlayer.onended = playNextOrPrev;
         
       }
 
@@ -429,17 +504,13 @@ export default {
           }
         
       }
-
-      // function deleteChildren(element){
-      //   var numChildren = element.children().length;
-      //   for(var i=0; i<numChildren; i++){
-      //       element.children()[0].remove();        
-      //   }
-      // }
-
+     
+      /**
+       * Hides currently displaying album to make room for
+       * the new one. Shows loading animation
+       */
       function resetAlbum(){
         document.getElementById("albumContainer").style.display = "none";
-        //document.getElementById("loadingScreen").style.display = "block";
         document.getElementById("lScreen").style.display = "block";
         // for(var i=0; i<currTrackList.length; i++){
         //     trackContainer.children()[0].remove();        
@@ -447,46 +518,19 @@ export default {
         // queue = [];
       }
 
+      /**
+       * Displays current album and hides the loadin screen
+       */
       function buildAlbum(){
-        
-        /* DOES NOTHING FOR NOW SINCE TRACKCONTAINER DNE RN */
-        // for(var i=0; i<currTrackList.length; i++){
-        //     var tr = $('<div>');
-        //     var song = currTrackList[i];
-            
-
-        //     // var songName = path.parse(songPath).name;
-        //     // tr.attr('id', 'track' + (i+1));
-        //     tr.attr("src",song.src);
-        //     tr.attr("display", song.name + " - " + "RAJIV");
-        //     tr.attr("class","tracks grid-container");
-        //     tr.click(playTrack);
-            
-        //     for(var j=0; j<2; j++){
-        //         var td = $('<b>');
-        //         td.attr("style","color: white;");
-        //         if(j==0){
-        //           //print number of track in album
-        //           td.text(i+1);
-        //           td.attr("id","controls"+(i+1));
-        //           td.attr("class","trackNumber play");
-        //         }
-        //         if(j==1){
-        //           td.text(song.name);
-        //           td.attr("class","songTitle");
-        //         }
-        //         tr.append(td);
-                
-        //     }
-        //     album.append(tr);
-        // }
-
         /* SHOWS ALBUM VIEW */
         document.getElementById("albumContainer").style.display = "block";
         document.getElementById("albumContainer").style.visibility = "visible";
         document.getElementById("lScreen").style.display = "none";
       }
 
+      /**
+       * Resets the side queue to make room to build a new one
+       */
       function resetSideQueue(){
         console.log("CHILDREN: "+sideQueue.children().length)
         if(sideQueue.children().length == 2){
@@ -499,8 +543,13 @@ export default {
         document.getElementById("sideQueue").checked = false;
  
       }
+
+      /**
+       * Makes a side queue consisting of songs of the current
+       * album's tracklist, in queue form, the sequence in which
+       * they will be played
+       */
       function buildSideQueue(sideQueue){
-        
         
         resetSideQueue();
 
@@ -509,6 +558,8 @@ export default {
         
         var ul = $("<ul>");
         ul.attr("class","listView");
+
+        // menu toggle button for the sideQueue
         sideQueue.append('<label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>');
 
         for(var i=0; i<queue.queue.length; i++){
@@ -517,13 +568,12 @@ export default {
             
             var li = $("<li>");
             var div = $("<div>");
-            // var songName = path.parse(songPath).name;
             div.attr('id', 'track' + (i+1));
             div.attr("src",song.src);
             div.attr("class","tracks "+ 'track' + (i+1));
             div.text(song.name);
             div.click(playTrack);
-            
+       
             li.append(div);
             ul.append(li);
         }
@@ -538,8 +588,9 @@ export default {
       function getQueue(currTrackPath,isShuffle,tracklist){    
           queue.queue = [];
           queue.albumCoverSRC = albumCoverSRC;
+          queue.albumIndex = albumIndex;
+          
           //when shuffle is off
-   
           if(!isShuffle){
               var currTrackIndex = 0;
               for(var i = 0; i < tracklist.length; i++){
@@ -564,16 +615,7 @@ export default {
 
           //when shuffle is on
           if(isShuffle){
-              var ignoredIndexes = [];
-              // for(i = 0; i < tracklist.length; i++){
-              //     //add current track to the front of the start of the queue
-              //     if(tracklist[i].src == currTrackPath){
-              //       queue.queue.push({"src":tracklist[i].src,"order":queue.queue.length+1,"name":tracklist[i].name});
-              //         ignoredIndexes.push(i);
-              //         break;
-              //     }
-              // }
-              
+              var ignoredIndexes = [];           
           
               while(queue.queue.length < tracklist.length){
                   var randSongIndex = Math.floor(Math.random() * tracklist.length);
@@ -620,6 +662,7 @@ export default {
     background-color: black;
     font-size: 30px;
     color: white;
+    text-overflow: clip;
 }
 .tracks:hover{
     opacity: 0.9;
