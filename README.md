@@ -2,7 +2,9 @@
 
 ## Website Link
 
-[JIVI](https://produceraw.com/) (Link best used on PC, Mobile format is still in the works)
+Preface: Link best used on PC, Mobile format is still in the works...
+
+--> [JIVI](https://produceraw.com/) <--
 
 ## Project Description
 
