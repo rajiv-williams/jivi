@@ -399,7 +399,7 @@ export default {
         if(htmlElement.attr("id") != undefined){
           playFromAlbumCover = htmlElement.attr("id").match("albumCover");
         }      
-
+        
         // if album cover is clicked
         if(playFromAlbumCover || htmlElement.attr("id") == undefined){
 
@@ -430,7 +430,6 @@ export default {
 
         // if you pressed on the queue itself, generate a new queue based on theh queue
         if(queue.queue.length > 0 && !playFromAlbumCover){
-          trackNum = 1;  
           queue = getQueue(currTrackSRC,isShuffle,queue.queue);          
         }
         else{
@@ -611,13 +610,15 @@ export default {
           //when shuffle is off
           if(!isShuffle){
               var currTrackIndex = 0;
-              for(var i = 0; i < tracklist.length; i++){
+              // loop going from first song to last song in tracklist
+              for(var i = trackNum-1; i < tracklist.length; i++){
                   console.log("TRACKLIST : " + tracklist[i].name)
                   if(tracklist[i].src == currTrackPath){
                       //skip current track from adding it to the queue
                       console.log("if loop: " + tracklist[i].name)
                       queue.queue.push({"src":tracklist[i].src,"order":queue.queue.length+1,"name":tracklist[i].name});
                       currTrackIndex = i;
+                      console.log("Order: " + queue.queue.length+1 + "Song: " + queue.queue[queue.queue.length-1].name)
                   }
                   // if track is after current track and 
                   // current track is not the last track in the tracklist
