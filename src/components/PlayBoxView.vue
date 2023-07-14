@@ -6,11 +6,31 @@
         <a id="songPlaying"></a>
       </div>
       
+      <div></div>
+
+      <!--PLAYBACK CONTROLS-->
+        <!-- PREVIOUS BUTTON -->
+        <font-awesome-icon id="prevButton" class="playbox-button" icon="fa-solid fa-backward-step" />
+        
+        <!-- MUSIC PLAYER -->
+        <audio id="musicPlayer"></audio>
+
+        <!-- NEXT BUTTON -->
+        <font-awesome-icon id="nextButton" class="playbox-button" icon="fa-solid fa-forward-step" />
       
-      <p id="prevButton"></p>
-      <audio id="musicPlayer"></audio>
-      <p id="nextButton"></p>
-      <img id="shuffleButton" alt="Shuffle" src="">
+      <div></div>
+
+      <!--EXTRA CONTROLS-->
+      <!-- <div class="extra-controls playbox-button">     
+      </div> -->
+    
+      <!-- SHUFFLE BUTTON -->
+        <font-awesome-icon id="shuffleButton" class="playbox-button shuffleOff" icon="fa-solid fa-shuffle" />
+
+        <!-- SAMPLE LINK -->
+        <font-awesome-icon id="sampleLink" class="playbox-button" icon="fa-solid fa-copyright" href=""/>  
+      
+      
       
     </div>
   
@@ -27,9 +47,9 @@ export default {
 <style lang="css">
 
 #displayAlbum{
-  width: 100px;
-  height: 100px;
-  margin: auto;
+  width: 80px;
+  height: 80px;
+  margin-right: 50%;
   visibility: hidden;
 }
 #songPlaying{
@@ -53,14 +73,22 @@ export default {
   margin: auto;
   background-color: black;
   display: grid;
-  grid-template-columns: 20% 20% 20% 20% 20%;
+  grid-template-columns: 15% 15% 7% 26% 7% 4% 13% 13%;
 }
 
 .songDetails{
   padding: 10px;
   display: grid;
   margin: auto;
-  grid-template-columns:  auto 150px;
+  grid-template-columns:  20% auto;
+}
+
+
+.extra-controls{
+  padding: 10px;
+  display: grid;
+  margin: auto;
+  grid-template-columns:  50% 50%;
 }
 
 #musicPlayer{
@@ -71,37 +99,68 @@ export default {
   background-color: #e3e3e3;
   
 }
-
+.playbox-button{
+  height: 25%;
+  width: 25%;
+  margin: auto;
+  text-align: center;
+}
+.playbox-button{
+  height: 25%;
+  width: 25%;
+  margin: auto;
+  color: #cacaca;
+}
+.playbox-button:hover{
+  height: 25%;
+  width: 25%;
+  margin: auto;
+  color: #aaaaaa;
+}
 #prevButton{
-  height: 40%;
-  width: 40%;
-  margin: auto;
   margin-left: 50%;
-  background-image: url("../assets/PREV.png");
-  background-size: 80%;
-  background-repeat:no-repeat;
-  background-position: center;
 }
-#prevButton:hover{
-  background-image: url("../assets/PREV_H.png");
+
+/* .button-link{
+  color: #cacaca;
 }
+.button-link:hover{
+  color: #aaaaaa;
+}
+.playback-control-button{
+  color: #cacaca;
+}
+.playback-control-button:hover{
+  color: #aaaaaa;
+} */
+/* #prevButton:hover{
+  color: #aaaaaa;
+} */
+
 #nextButton{
-  height: 40%;
-  width: 40%;
-  margin: auto;
   margin-right: 50%;
-  background-image: url("../assets/NEXT.png");
-  background-size: 80%;
-  background-repeat:no-repeat;
-  background-position: center;
 }
-#nextButton:hover{
-  background-image: url("../assets/NEXT_H.png");
+
+/* #nextButton:hover{
+   color: #aaaaaa;
+} */
+
+.shuffleOff{
+  color: #cacaca;
 }
+
+.shuffleOn{
+  color: rgb(210, 156, 255);
+}
+
 #shuffleButton{
-  height: 70%;
-  width: 70%;
+   height: 25%;
+  width: 25%;
   margin: auto;
+}
+/*purple: 210 156 255 */
+#shuffleButton:hover{
+  color: #aaaaaa;
 }
 
 </style>

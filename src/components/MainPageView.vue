@@ -6,9 +6,6 @@
   <side-queue/>  
   <album-view/>   
   <play-box-view />
-  <!-- <input type="file" ref="myfile">
-  <button id="addButton" @click="upload">ADD</button> -->
-  
   
 </template>
 
@@ -32,6 +29,7 @@ export default {
       // let trackContainer = $("#albumTrackContainer");
       //let currAlbumCover = $("#albumCover");
       let currTrackList = [];
+      let currAlbumCredits = [];
       let currTrackSRC = null;
 
       let albumIndex = 0;
@@ -39,6 +37,7 @@ export default {
       let albumCoverSRC = "";
       let isShuffle = false;
       let shuffleButton = $("#shuffleButton");
+      let copyrightButton = $("#copyrightButton");
       // let shuffleButton = document.getElementById("shuffleButton")
       let queue = {"queue":[],"albumCoverSRC":"","albumIndex":0};
       //let queue = [];
@@ -61,7 +60,6 @@ export default {
         loadFirebaseData();
 
         // Images 
-        shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
         $(".playButton").attr("src",require("../assets/PLAY_BUTTON.png"))
         $(".jivi_logo").attr("src",require("../assets/JIVI_LOGO.png"))
         $("#instagramLogo").attr("src",require("../assets/IG.png"))
@@ -89,10 +87,15 @@ export default {
             toggleShuffleStyling();
           }
         }); 
+
+        // Copyrigh Button Logic
+        copyrightButton.click(function(){
+          alert("Test");
+        });
      
-        shuffleButton.hover(function(){
-          shuffleButton.attr("src",require("../assets/SHUFFLE_H.png"));
-        },toggleShuffleStyling)  
+        // shuffleButton.hover(function(){
+        //   //shuffleButton.attr("src",require("../assets/SHUFFLE_H.svg"));
+        // },toggleShuffleStyling)  
 
 
         // [TEMPORARY FIX] 
@@ -158,10 +161,10 @@ export default {
        */
       function toggleShuffleStyling(){
         if(isShuffle){   
-          shuffleButton.attr("src",require("../assets/SHUFFLE_OFF.png"));
+          shuffleButton.attr("class","shuffleOn");
         }
         else{
-          shuffleButton.attr("src",require("../assets/SHUFFLE_ON.png"));
+           shuffleButton.attr("class","shuffleOff");
         }
       }
 
@@ -319,6 +322,7 @@ export default {
         //TODO: SHOW CIRCULAR PROGRESS INDICATOR
 
         currTrackList = [];
+        currAlbumCredits = [];
         
         const listRef = ref(storage, albumDirectory);
 
@@ -333,9 +337,17 @@ export default {
               await getMetadata(songRef)
                 .then((metadata) => {
                   songName = metadata.name.split(".")[0].toUpperCase().replace("_"," ")
-                  if(url.match(".mp3")){
+                  
+                  // if current file is an audio file
+                  if(url.match(".mp3") || url.match(".wav") || url.match(".m4a")){
                     currTrackList.push({"src":url,"name":songName,"order":index+1});
                   }
+                  // if current file is a csv with album credits
+                  else if(url.match(".csv")){
+                    // parse csv to get song_name, sample_url, sample_name
+                    currAlbumCredits.push({"name":})
+                  }
+                  // if current file is an image
                   else{
                     // set album cover
                     $("#albumCover").attr("src",url);
