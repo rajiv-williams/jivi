@@ -39,6 +39,7 @@ export default {
       let albumCoverSRC = "";
       let isShuffle = false;
       let shuffleButton = $("#shuffleButton");
+      let copyrightButton = $("#copyrightButton");
       // let shuffleButton = document.getElementById("shuffleButton")
       let queue = {"queue":[],"albumCoverSRC":"","albumIndex":0};
       //let queue = [];
@@ -47,7 +48,6 @@ export default {
       let trackNum = 0;
       let defaultClass = "tracks";
       musicPlayer.controls = true;
-      let songIsPlaying = false;
       let sideQueue = $("#sideQueueContainer");
       let playAlbumAutomatically = false;
       
@@ -88,17 +88,13 @@ export default {
         }); 
 
         // Copyright Button Logic
-        $("#copyrightButton").click(function(){
-          if(songIsPlaying){
-            for(var i = 0; i < currAlbumCredits.length; i++){
-              if(currAlbumCredits[i].song_name === queue.queue[0].name){
-                // go to the link of the sample
-                alert(currAlbumCredits[i].sample_url)
-              }
+        copyrightButton.click(function(){
+          for(var i = 0; i < currAlbumCredits.length; i++){
+            if(currAlbumCredits[i].song_name === queue.queue[queueIndex].name){
+              // go to the link of the sample
+              
+              window.open(currAlbumCredits[i].sample_url, '_blank');
             }
-          }
-          else{
-            alert("No song is currently playing")
           }
         });
         
@@ -478,7 +474,10 @@ export default {
         currTrackSRC = queue.queue[0].src;
         musicPlayer.src = currTrackSRC;
         musicPlayer.play();
-        songIsPlaying = true;
+        
+        // show copyright button
+        copyrightButton.attr("class","playbox-button show");
+
         showIndicationOfCurrentlyPlayingAlbum();
         buildSideQueue(sideQueue);      
         
@@ -548,7 +547,10 @@ export default {
               document.getElementById("displayAlbum").style.visibility = "hidden";
               queueIndex = 0;
               queue.queue = [];
-              songIsPlaying = false;
+
+              // hide copyright button
+              copyrightButton.attr("class","playbox-button hide");
+
               resetSideQueue();
               playAlbumAutomatically = true;
 

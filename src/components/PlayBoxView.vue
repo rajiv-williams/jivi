@@ -28,7 +28,7 @@
         <font-awesome-icon id="shuffleButton" class="playbox-button shuffleOff" icon="fa-solid fa-shuffle" />
 
         <!-- SAMPLE LINK -->
-        <font-awesome-icon id="copyrightButton" class="playbox-button" icon="fa-solid fa-copyright" href=""/>  
+        <font-awesome-icon id="copyrightButton" class="playbox-button hide" icon="fa-solid fa-copyright" href=""/>  
       
       
       
@@ -162,5 +162,10 @@ export default {
 #shuffleButton:hover{
   color: #aaaaaa;
 }
-
+.show{
+  visibility: visible;
+}
+.hide{
+  visibility: hidden;
+}
 </style>
