@@ -28,7 +28,7 @@
         <font-awesome-icon id="shuffleButton" class="playbox-button shuffleOff" icon="fa-solid fa-shuffle" />
 
         <!-- SAMPLE LINK -->
-        <font-awesome-icon id="sampleLink" class="playbox-button" icon="fa-solid fa-copyright" href=""/>  
+        <font-awesome-icon id="copyrightButton" class="playbox-button" icon="fa-solid fa-copyright" href=""/>  
       
       
       

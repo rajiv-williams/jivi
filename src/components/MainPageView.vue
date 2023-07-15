@@ -15,6 +15,8 @@ import PlayBoxView from '@/components/PlayBoxView.vue';
 import AlbumView from '@/components/AlbumView.vue'
 import SideQueue from '@/components/SideQueue.vue';
 import HomeMenuView from '@/components/HomeMenuView.vue'
+/* import csv parser */
+import Papa from 'papaparse';
 import { storage } from "@/firebase/firebase"
 import {ref,listAll,getDownloadURL,getMetadata} from "firebase/storage"
 import "firebase/storage"
@@ -37,7 +39,6 @@ export default {
       let albumCoverSRC = "";
       let isShuffle = false;
       let shuffleButton = $("#shuffleButton");
-      let copyrightButton = $("#copyrightButton");
       // let shuffleButton = document.getElementById("shuffleButton")
       let queue = {"queue":[],"albumCoverSRC":"","albumIndex":0};
       //let queue = [];
@@ -82,16 +83,25 @@ export default {
 
         // Shuffle Toggling
         shuffleButton.click(function(){
-          if(!songIsPlaying){
-            isShuffle = !isShuffle;
-            toggleShuffleStyling();
-          }
+          isShuffle = !isShuffle;
+          toggleShuffleStyling();
         }); 
 
-        // Copyrigh Button Logic
-        copyrightButton.click(function(){
-          alert("Test");
+        // Copyright Button Logic
+        $("#copyrightButton").click(function(){
+          if(songIsPlaying){
+            for(var i = 0; i < currAlbumCredits.length; i++){
+              if(currAlbumCredits[i].song_name === queue.queue[0].name){
+                // go to the link of the sample
+                alert(currAlbumCredits[i].sample_url)
+              }
+            }
+          }
+          else{
+            alert("No song is currently playing")
+          }
         });
+        
      
         // shuffleButton.hover(function(){
         //   //shuffleButton.attr("src",require("../assets/SHUFFLE_H.svg"));
@@ -135,7 +145,7 @@ export default {
         $(".playable").hover(function(){
           // get children of this playable element
           var children = document.getElementById($(this).attr("id")).children;
-          console.log(children.length)
+          //console.log(children.length)
           
           for(var i = 0; i < children.length; i++){
             // get the element where the image of the overlay is
@@ -344,8 +354,25 @@ export default {
                   }
                   // if current file is a csv with album credits
                   else if(url.match(".csv")){
+                    console.log("Before Parse")
                     // parse csv to get song_name, sample_url, sample_name
-                    currAlbumCredits.push({"name":})
+                    
+                    console.log("URL: "+url);
+
+                    Papa.parse(url, {
+                      header: true,
+                      download: true,
+                      skipEmptyLines: true,
+                      complete: function(result) {
+                         
+                         currAlbumCredits = result.data;
+                         console.log(currAlbumCredits);
+                      }
+                    }
+                    );
+                    console.log("After Parse")
+                    //currAlbumCredits.push({"name":})
+                    
                   }
                   // if current file is an image
                   else{
@@ -451,6 +478,7 @@ export default {
         currTrackSRC = queue.queue[0].src;
         musicPlayer.src = currTrackSRC;
         musicPlayer.play();
+        songIsPlaying = true;
         showIndicationOfCurrentlyPlayingAlbum();
         buildSideQueue(sideQueue);      
         
@@ -520,6 +548,7 @@ export default {
               document.getElementById("displayAlbum").style.visibility = "hidden";
               queueIndex = 0;
               queue.queue = [];
+              songIsPlaying = false;
               resetSideQueue();
               playAlbumAutomatically = true;
 
