@@ -1,12 +1,19 @@
 <template>
+   
     <!--PLAY BOX-->
     <div id="playBox">
+      <!--SONG DETAILS-->
       <div class="songDetails">
         <img id="displayAlbum" alt="Album Cover" src=""> 
-        <a id="songPlaying"></a>
+        
       </div>
       
+      <a id="songPlaying"></a>
+
       <div></div>
+
+      <!-- SHUFFLE BUTTON -->
+      <font-awesome-icon id="shuffleButton" class="playbox-button shuffleOff" icon="fa-solid fa-shuffle" />
 
       <!--PLAYBACK CONTROLS-->
         <!-- PREVIOUS BUTTON -->
@@ -18,21 +25,35 @@
         <!-- NEXT BUTTON -->
         <font-awesome-icon id="nextButton" class="playbox-button" icon="fa-solid fa-forward-step" />
       
-      <div></div>
+       
 
       <!--EXTRA CONTROLS-->
-      <!-- <div class="extra-controls playbox-button">     
-      </div> -->
-    
-      <!-- SHUFFLE BUTTON -->
-        <font-awesome-icon id="shuffleButton" class="playbox-button shuffleOff" icon="fa-solid fa-shuffle" />
+      
+      
 
-        <!-- SAMPLE LINK -->
-        <font-awesome-icon id="copyrightButton" class="playbox-button hide" icon="fa-solid fa-copyright" href=""/>  
-      
-      
-      
+      <!-- COPYIGHT CREDITS -->
+      <font-awesome-icon id="copyrightButton" class="playbox-button hide" icon="fa-solid fa-copyright" href=""/>
+
+      <!-- SAMPLE LINK -->
+      <font-awesome-icon id="sampleLink" class="playbox-button hide" icon="fa-solid fa-up-right-from-square" href=""/>
+
+
+
+        <!-- MODAL VERSION
+        <font-awesome-icon data-modal-target="#credits-popup" id="copyrightButton" class="playbox-button hide" icon="fa-solid fa-copyright" href=""/>   -->
+
+        <!--CREDITS POPUP-->
+        <!-- <div class="modal" id="credits-popup">
+          <div class="modal-header">
+            <div class="title" id="credits-title">SONG NAME CREDITS</div>
+            <button data-close-button class="close-button">&times;</button>
+          </div>
+          <div class="modal-body"></div>
+        </div> -->
+
     </div>
+
+    
   
 </template>
 
@@ -73,14 +94,13 @@ export default {
   margin: auto;
   background-color: black;
   display: grid;
-  grid-template-columns: 15% 15% 7% 26% 7% 4% 13% 13%;
+  grid-template-columns: 4% 12% 6% 8% 5% 30% 5% 8% 8% 14%;
 }
-
+/* grid-template-columns: 15% 15% 7% 26% 7% 3% 9% 9% 9%; */
 .songDetails{
   padding: 10px;
   display: grid;
   margin: auto;
-  grid-template-columns:  20% auto;
 }
 
 
@@ -93,6 +113,7 @@ export default {
 
 #musicPlayer{
   max-width: 100%;
+  width: 100%;
   margin: auto;
 }
 #musicPlayer::-webkit-media-controls-panel {
@@ -162,6 +183,75 @@ export default {
 #shuffleButton:hover{
   color: #aaaaaa;
 }
+
+.modal{
+  position: fixed;
+  margin: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%) scale(0);
+  -ms-transform: translate(-50%, -50%) scale(0);
+  transition: 200ms ease-in-out;
+  border: 1px solid black;
+  border-radius: 10px;
+  z-index: 2;
+  background-color: white;
+  /* 500px */
+  max-width: 80%;
+  height: 500px;
+  width: 100%;
+  max-height: 100%;
+  display: inline-block;
+}
+
+.modal .active{
+  transform: translate(-50%,-50%) scale(1);
+   -ms-transform: translate(-50%, -50%) scale(1);
+}
+
+.modal-header{
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid black;
+}
+
+.modal-header .title{
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.modal-header .close-button{
+  cursor: pointer;
+  border: none;
+  outline: none;
+  background: none;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.modal-body{
+  padding: 10px 15px;
+}
+
+
+#overlay{
+  position: fixed;
+  opacity: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,.5);
+  pointer-events: none;
+}
+
+#overlay.active{
+  pointer-events: all;
+  opacity: 1;
+}
+
 .show{
   visibility: visible;
 }

@@ -5,7 +5,9 @@
         <div id="albumContainer" class="playable">
           <img alt="Album Cover" id="albumCover" src="">
           <img class="playButton" src="">
+              
           <!-- <div id="albumTrackContainer"></div> -->
+          
         </div>
       
       

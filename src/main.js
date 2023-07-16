@@ -13,9 +13,11 @@ import { faShuffle } from '@fortawesome/free-solid-svg-icons'
 import { faForwardStep } from '@fortawesome/free-solid-svg-icons'
 import { faBackwardStep } from '@fortawesome/free-solid-svg-icons'
 import { faCopyright } from '@fortawesome/free-solid-svg-icons'
+import { faUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
 
 /* add icons to the library */
-library.add(faUserSecret,faShuffle,faForwardStep,faBackwardStep,faCopyright)
+library.add(faUserSecret,faShuffle,faForwardStep,faBackwardStep,
+    faCopyright,faUpRightFromSquare)
 
 
 createApp(App)

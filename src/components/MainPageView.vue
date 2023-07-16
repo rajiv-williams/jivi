@@ -1,11 +1,20 @@
 <template>
 
-  <div id="background">
-  </div>
+  <div id="background"></div>
+  
   <home-menu-view/>
   <side-queue/>  
-  <album-view/>   
-  <play-box-view />
+  <album-view/>  
+  <play-box-view/>
+  
+  
+
+  <!-- DARKEN SCEEN OVERLAY -->
+  <div id="overlay">
+    
+  </div>
+  
+  
   
 </template>
 
@@ -40,6 +49,7 @@ export default {
       let isShuffle = false;
       let shuffleButton = $("#shuffleButton");
       let copyrightButton = $("#copyrightButton");
+      let sampleLink = $("#sampleLink")
       // let shuffleButton = document.getElementById("shuffleButton")
       let queue = {"queue":[],"albumCoverSRC":"","albumIndex":0};
       //let queue = [];
@@ -51,10 +61,13 @@ export default {
       let sideQueue = $("#sideQueueContainer");
       let playAlbumAutomatically = false;
       
+      // POPUP
+        const openModalButtons = document.querySelectorAll('[data-modal-target]');
+        const closeModalButtons = document.querySelectorAll('[data-close-button]');
+        const overlay = document.getElementById('overlay');
       
       
       $(document).ready(async function(){
-
         // --- Initialization ---
 
         // Database for Music
@@ -89,19 +102,63 @@ export default {
 
         // Copyright Button Logic
         copyrightButton.click(function(){
+          var sampleDisplay = "Sample: ";
           for(var i = 0; i < currAlbumCredits.length; i++){
             if(currAlbumCredits[i].song_name === queue.queue[queueIndex].name){
-              // go to the link of the sample
-              
-              window.open(currAlbumCredits[i].sample_url, '_blank');
+
+              //if string isn't empty
+              if(currAlbumCredits[i].sample_name){
+                alert(sampleDisplay + currAlbumCredits[i].sample_name);
+              }
+              else{
+                alert(sampleDisplay + "Unknown");
+              }
+
             }
           }
         });
-        
-     
-        // shuffleButton.hover(function(){
-        //   //shuffleButton.attr("src",require("../assets/SHUFFLE_H.svg"));
-        // },toggleShuffleStyling)  
+
+        sampleLink.click(function(){
+          for(var i = 0; i < currAlbumCredits.length; i++){
+            if(currAlbumCredits[i].song_name === queue.queue[queueIndex].name){
+
+              //if string isn't empty
+              if(currAlbumCredits[i].sample_url){
+
+                // pause music
+                musicPlayer.pause();
+
+                // go to the link of the sample
+                window.open(currAlbumCredits[i].sample_url, '_blank');
+              }
+              else{
+                alert("No sample found in database.");
+              }
+
+            }
+          }
+        })
+
+        openModalButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            const modal = document.querySelector(button.dataset.modalTarget)
+            openModal(modal)
+          })
+        })
+
+        overlay.addEventListener('click', () => {
+          const modals = document.querySelectorAll('.modal.active')
+          modals.forEach(modal => {
+            closeModal(modal)
+          })
+        })
+
+        closeModalButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            const modal = button.closest('.modal')
+            closeModal(modal)
+          })
+        })
 
 
         // [TEMPORARY FIX] 
@@ -161,6 +218,17 @@ export default {
           }
         })
       });
+
+      function openModal(modal){
+        if(modal == null) return;
+        modal.classList.add('active');
+        overlay.classList.add('active') 
+      }
+      function closeModal(modal){
+        if(modal == null) return;
+        modal.classList.remove('active');
+        overlay.classList.remove('active') 
+      }
 
       /**
        * Function toggles the shuffle button's styling
@@ -408,6 +476,11 @@ export default {
 
       }
 
+      function toggleExtraPlayBoxButtonsDisplay(state){
+        copyrightButton.attr("class","playbox-button "+state);
+        sampleLink.attr("class","playbox-button "+state);
+      }
+
       /**
        * Plays track based on many different contexts:
        * 
@@ -476,7 +549,7 @@ export default {
         musicPlayer.play();
         
         // show copyright button
-        copyrightButton.attr("class","playbox-button show");
+        toggleExtraPlayBoxButtonsDisplay("show");
 
         showIndicationOfCurrentlyPlayingAlbum();
         buildSideQueue(sideQueue);      
@@ -549,7 +622,7 @@ export default {
               queue.queue = [];
 
               // hide copyright button
-              copyrightButton.attr("class","playbox-button hide");
+              toggleExtraPlayBoxButtonsDisplay("hide");
 
               resetSideQueue();
               playAlbumAutomatically = true;
@@ -564,6 +637,8 @@ export default {
           }
         
       }
+
+
      
       /**
        * Hides currently displaying album to make room for
@@ -700,19 +775,18 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="css">
-/* body{
-  background-image: url("../assets/background.jpg");
-} */
+
+
 #background{
   position: fixed;
   bottom: 0%;
   right: 0%;
   width: 100%;
   height: 100%;
-  background-image: url("../assets/background.jpg");
   background-position: center;
   filter: blur(8px);
   -webkit-filter: blur(8px);  
+  z-index: -3;
 }
 #albumList{
  top: 0; 
@@ -787,11 +861,13 @@ export default {
 } */
 
 body, html {
-  height: 10%;
+  height: 100%;
+  width: 100%;
 }
 
-* {
+
+/* * {
   box-sizing: border-box;
-}
+} */
 
 </style>
