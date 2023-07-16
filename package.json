@@ -24,7 +24,6 @@
     "get-audio-duration": "^3.1.1",
     "jquery": "^3.6.3",
     "path-browserify": "^1.0.1",
-    "protobufjs": "^7.2.4",
     "require-context": "^1.1.0",
     "semver": "^7.5.2",
     "vue": "^3.2.45"
