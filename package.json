@@ -13,35 +13,45 @@
     "@fortawesome/free-regular-svg-icons": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
     "@fortawesome/vue-fontawesome": "^3.0.3",
-    "bl": "^1.2.3",
+    "@sideway/address": "^5.0.0",
+    "@types/node": "^22.9.3",
+    "@vue/cli-plugin-babel": "^5.0.8",
+    "@vue/cli-plugin-eslint": "^5.0.8",
+    "@vue/cli-service": "^5.0.8",
+    "bl": "^6.0.16",
     "browserify": "^17.0.0",
-    "core-js": "^3.27.2",
+    "core-js": "^3.39.0",
     "csv-parse": "^5.4.0",
+    "eslint": "^9.15.0",
+    "expose-loader": "^5.0.0",
     "firebase": "^11.0.2",
     "fs": "^0.0.1-security",
     "fs-extra": "^11.1.0",
     "fs.promises": "^0.1.2",
-    "get-audio-duration": "^3.1.1",
+    "get-audio-duration": "^4.0.1",
+    "html-minifier": "^4.0.0",
+    "html-webpack-plugin": "^5.6.3",
     "jquery": "^3.6.3",
+    "loader-utils": "^3.3.1",
+    "lru-cache": "^11.0.2",
     "path-browserify": "^1.0.1",
     "require-context": "^1.1.0",
+    "rollup-plugin-node-externals": "^7.1.3",
+    "sass": "^1.81.0",
+    "sass-loader": "^16.0.3",
     "semver": "^7.5.2",
-    "vue": "^3.2.45"
+    "serialize-javascript": "^6.0.2",
+    "ssri": "^12.0.0",
+    "tough-cookie": "^5.0.0",
+    "vue": "^3.5.13",
+    "vue-template-compiler": "^2.7.16",
+    "webpack-dev-middleware": "^7.4.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
     "@babel/eslint-parser": "^7.19.1",
-    "@types/node": "^18.11.18",
-    "@vue/cli-plugin-babel": "~5.0.8",
-    "@vue/cli-plugin-eslint": "~5.0.8",
-    "@vue/cli-service": "~5.0.8",
-    "eslint": "^8.32.0",
     "eslint-plugin-vue": "^9.9.0",
-    "expose-loader": "^4.0.0",
-    "node-sass": "^8.0.0",
     "papaparse": "^5.4.1",
-    "rollup-plugin-node-externals": "^5.1.0",
-    "sass-loader": "^13.2.0",
     "vue-cli-plugin-vuetify": "~2.5.8",
     "webpack": "^5.96.1"
   },
@@ -69,5 +79,57 @@
     "fs": false,
     "path": false,
     "os": false
+  },
+  "overrides": {
+    "webpack-dev-server": {
+      "webpack-dev-middleware": "7.4.2"
+    },
+    "request": {
+      "tough-cookie": "5.0.0"
+    },
+    "@vue/cli-shared-utils": {
+      "@vue/cli-plugin-babel": "5.0.8"
+    },
+    "request-promise-core": {
+      "request-promise-native": "1.0.9"
+    },
+    "request-promise-native": {
+      "tough-cookie": "5.0.0"
+    },
+    "cacache": {
+      "ssri": "12.0.0"
+    },
+    "copy-webpack-plugin": {
+      "serialize-javascript": "6.0.2"
+    },
+    "postcss": "8.4.49",
+    "css-select": {
+      "nth-check": "2.1.1"
+    },
+    "node-forge": "1.3.1",
+    "@vue/cli-service": {
+      "html-webpack-plugin": {
+        "json5": "2.2.3"
+      },
+      "@vue/cli-shared-utils": "5.0.8",
+      "html-minifier": "4.0.0"
+    },
+    "ip": {
+      "webpack-dev-server": "5.1.0"
+    },
+    "dns-packet": "5.6.1",
+    "multicast-dns": "7.2.5",
+    "bonjour": "3.5.0",
+    "ejs": "3.1.10",
+    "@vue/cli-plugin-eslint": {
+      "cross-spawn": "7.0.6",
+      "eslint": {
+        "ajv": "8.17.1"
+      },
+      "@vue/cli-shared-utils": "5.0.8"
+    },
+    "braces": "3.0.3",
+    "micromatch": "4.0.8",
+    "http-proxy-middleware": "3.0.3"
   }
 }

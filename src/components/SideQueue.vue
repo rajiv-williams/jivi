@@ -20,7 +20,7 @@ export default {
 }
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 // CREDIT: https://codepen.io/anon/embed/JjJMwo?default-tab=result&height=500&slug-hash=chKqD&theme-id=1#html-box
 *
   margin: 0
@@ -38,9 +38,9 @@ label
     outline: none
 
 .listView
-  list-style: none;
-  margin: 0;
-  padding: 0;
+  list-style: none
+  margin: 0
+  padding: 0
 
 .sideQueue
   position: fixed
@@ -92,41 +92,8 @@ label
 
     
     
-/* for show */
-// html, body
-//   height: 100%
-
-// body
-//   background: url(https://37.media.tumblr.com/f6c67ec2821a91051e4175f8a102e1e2/tumblr_n6rzpcsMk41st5lhmo1_1280.jpg) 50% 50% / cover
 
 p
   margin-bottom: 15px
-
-// #info
-//   display: table
-//   background: rgba(0,0,0,0.4)
-//   height: 100%
-//   width: 100%
-//   #info-content
-//     display: table-cell
-//     vertical-align: middle
-//     text-align: center
-//     text-transform: uppercase
-//     color: #fff
-//     font-size: 12px
-//     h1      
-//       color: #fff
-//       border: 3px solid #fff
-//       text-align: center
-//       background: rgba(0,0,0,0.1)
-//       font-size: 22px
-//       font-weight: normal
-//       padding: 20px
-//       margin: 10px
-//       display: inline-block      
-//       strong
-//         display: block
-//         font-size: 26px
-   
 
 </style>

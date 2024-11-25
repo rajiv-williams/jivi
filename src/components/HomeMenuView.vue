@@ -57,7 +57,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="sass">
+<style lang="sass" scoped>
 *
   margin: 0
   padding: 0
@@ -105,7 +105,7 @@ label
   color: white
   padding: auto
   display: grid
-  grid-template-columns: 10% 90%;
+  grid-template-columns: 10% 90%
 .albumMenuItem 
   max-width: 100%
   max-height: 45px
@@ -189,32 +189,6 @@ label
 
 p
   margin-bottom: 15px
-
-// #info
-//   display: table
-//   background: rgba(0,0,0,0.4)
-//   height: 100%
-//   width: 100%
-//   #info-content
-//     display: table-cell
-//     vertical-align: middle
-//     text-align: center
-//     text-transform: uppercase
-//     color: #fff
-//     font-size: 12px
-//     h1      
-//       color: #fff
-//       border: 3px solid #fff
-//       text-align: center
-//       background: rgba(0,0,0,0.1)
-//       font-size: 22px
-//       font-weight: normal
-//       padding: 20px
-//       margin: 10px
-//       display: inline-block      
-//       strong
-//         display: block
-//         font-size: 26px
    
 
 </style>
