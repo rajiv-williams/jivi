@@ -2,8 +2,8 @@
 
     <input type="checkbox" id="sideQueue" name="sideQueue" class="menu-checkbox">
     <div class="sideQueue" id="sideQueueContainer">
-        <!-- <label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>
-        <ul class="listView">
+        <label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>
+        <!-- <ul class="listView">
           <li>
               <div class="tracks">Menu-1</div>
           </li>

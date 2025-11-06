@@ -3,12 +3,12 @@
     <div class="homeMenu" id="homeMenuContainer">
         <label class="menu-toggle" for="homeMenu"><span>Toggle</span></label>
         <ul class="listView">
-          <img class="jivi_logo" src="">
+          <img class="jivi_logo" src="../assets/JIVI_LOGO.png">
           <li>
               <label for="albumMenu" class="menu-item">ALBUMS</label>
               <input type="checkbox" id="albumMenu" name="album-menu" class="menu-checkbox sub-menu-checkbox" checked>
               <div class="homeMenu" id="albumMenuContainer">
-                  <label class="menu-toggle" id="albumMenuIcon" for="albumMenu"><span>Toggle</span></label>
+                  <label class="sub-menu-toggle" id="albumMenuIcon" for="albumMenu"><span>Toggle</span></label>
                   <div class="menu-title">ALBUMS</div>
                   <ul id="albumList" class="listView">
                     <!-- Albums added from javascript go here -->
@@ -20,24 +20,24 @@
               <label for="socialMenu" class="menu-item">SOCIALS</label>
               <input type="checkbox" id="socialMenu" name="social-menu" class="menu-checkbox sub-menu-checkbox" checked>
               <div class="homeMenu" id="albumMenuContainer">
-                  <label class="menu-toggle" id="socialMenuIcon" for="socialMenu"><span>Toggle</span></label>
+                  <label class="sub-menu-toggle" id="socialMenuIcon" for="socialMenu"><span>Toggle</span></label>
                   <div class="menu-title">SOCIALS</div>
-                  <ul id="albumList" class="listView">
+                  <ul class="listView">
                     <li>
                       <div class="socialMenuItem">
-                        <img class="socialLogo" id="instagramLogo" src="" alt="Instagram">
-                        <a href="https://www.instagram.com/produceraw/">@produceraw</a>
+                        <img class="socialLogo" id="instagramLogo" src="../assets/IG.png" alt="Instagram">
+                        <a href="https://www.instagram.com/uhrajiv/">@uhrajiv</a>
                       </div>
                     </li>
                     <li>
                       <div class="socialMenuItem">
-                        <img class="socialLogo" id="youtubeLogo" src="" alt="YouTube">
+                        <img class="socialLogo" id="youtubeLogo" src="../assets/YT.png" alt="YouTube">
                         <a href="https://www.youtube.com/@producerraw7497">PRODUCER RAW</a>
                       </div>
                     </li>
                     <li>
                       <div class="socialMenuItem">
-                        <img class="socialLogo" id="linkedinLogo" src="" alt="LinkedIN">
+                        <img class="socialLogo" id="linkedinLogo" src="../assets/IN.png" alt="LinkedIN">
                         <a href="https://www.linkedin.com/in/rajiv-williams/">Rajiv Williams</a>
                       </div>
                     </li>
@@ -78,7 +78,6 @@ label
 
 .jivi_logo
   width: 100%
-  position:absolute
 
 .menu-title
   max-width: 100%
@@ -106,6 +105,7 @@ label
   padding: auto
   display: grid
   grid-template-columns: 10% 90%
+  
 .albumMenuItem 
   max-width: 100%
   max-height: 45px
@@ -154,6 +154,16 @@ label
     border-collapse: collapse
     box-shadow: 1px 1px black
   
+  label.sub-menu-toggle  
+    position: absolute    
+    left: -60px
+    width: 60px
+    height: 60px
+    line-height: 0px    
+    display: block
+    padding: 0
+    text-indent: -9999px
+
   ul
     li
       a, label

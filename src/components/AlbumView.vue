@@ -4,7 +4,7 @@
       <p id="leftArrow" class="navigation"></p>
         <div id="albumContainer" class="playable">
           <img alt="Album Cover" id="albumCover" src="">
-          <img class="playButton" src="">
+          <img class="playButton" src="../assets/PLAY_BUTTON.png">
               
           <!-- <div id="albumTrackContainer"></div> -->
           

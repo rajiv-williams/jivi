@@ -37,6 +37,7 @@ export default {
       
       let albumList = [];
       let albumListElement = $("#albumList");
+      // let albumListElement = document.getElementById("albumList");
       // let trackContainer = $("#albumTrackContainer");
       //let currAlbumCover = $("#albumCover");
       let currTrackList = [];
@@ -45,6 +46,7 @@ export default {
 
       let albumIndex = 0;
       let albumTitle = $(".albumTitle");
+
       let albumCoverSRC = "";
       let isShuffle = false;
       let shuffleButton = $("#shuffleButton");
@@ -74,11 +76,12 @@ export default {
         loadFirebaseData();
 
         // Images 
-        $(".playButton").attr("src",require("../assets/PLAY_BUTTON.png"))
-        $(".jivi_logo").attr("src",require("../assets/JIVI_LOGO.png"))
-        $("#instagramLogo").attr("src",require("../assets/IG.png"))
-        $("#youtubeLogo").attr("src",require("../assets/YT.png"))
-        $("#linkedinLogo").attr("src",require("../assets/IN.png"))
+        //$(".playButton").attr("src",require("../assets/PLAY_BUTTON.png"))
+        //$(".playButton").attr("src",require("../assets/PLAY_BUTTON.png"))
+        //$(".jivi_logo").attr("src",require("../assets/JIVI_LOGO.png"))
+        // $("#instagramLogo").attr("src",require("../assets/IG.png"))
+        // $("#youtubeLogo").attr("src",require("../assets/YT.png"))
+        //$("#linkedinLogo").attr("src",require("../assets/IN.png"))
 
 
         // --- Event Listeners ---
@@ -252,6 +255,8 @@ export default {
 
         // after albums are loaded, make them clickable
         $(".albumMenuItem").click(playAlbum);
+
+        
       }
 
       /**
@@ -263,7 +268,7 @@ export default {
 
         var albumName = $(this).text();
         // find out if album being played is to the left or right of current album
-
+        
         // find new album index
         for(var i =0; i < albumList.length; i++){
           if(albumList[i] == albumName){
@@ -334,24 +339,30 @@ export default {
           // gets all the <div>'s in the current <li>
           var albumListMenuItems = listItems[i].children;
           var albumVinyl = null;
+          
 
           for(var j = 0; j < albumListMenuItems.length; j++){
-
+            
             // gets the <img> in the current <div>
             albumVinyl = albumListMenuItems[j].children[0];
-
+            
             // Reset previous album playing
             if(albumListMenuItems[j].classList.contains("albumPlaying") && albumVinyl!=null){
-              albumListMenuItems[j].classList.remove("albumPlaying");
-              albumVinyl.setAttribute("src",""); 
-            }
 
+              albumListMenuItems[j].classList.remove("albumPlaying");
+              albumVinyl.setAttribute("src","");
+              
+            }
+            //alert(albumListMenuItems[j].innerText == albumList[queue.albumIndex] && albumVinyl!=null);
             // Set the current album playing
             if(albumListMenuItems[j].innerText == albumList[queue.albumIndex] && albumVinyl!=null){
+              
               albumListMenuItems[j].classList.add("albumPlaying");
-              albumVinyl.setAttribute("src",require("../assets/vinyl.gif"));
+              albumVinyl.setAttribute("src","src/assets/vinyl.gif"); 
+
+              //albumVinyl.setAttribute("src",require("../assets/vinyl.gif"));
             }      
-  
+             
           }
         }
       }
@@ -489,17 +500,17 @@ export default {
        * -etc.
        */
       function playTrack(){
-
+        
         // reset of symbol displayed when you hover over track number
         // $(".trackNumber").attr("class","trackNumber play");
         
         // previous track that was playing is unhighlighted (reset)
-        $(".trackPlaying").attr("class",defaultClass );
+        $(".trackPlaying").attr("class",defaultClass);
 
         // previous track that was playing has play button show
         // when hovered over (reset)
         $("#controls"+trackNum).attr("class","trackNumber play");
-
+        
         var htmlElement = $(this);
 
         // play all tracks from when you open the album
@@ -543,15 +554,14 @@ export default {
         else{
           queue = getQueue(currTrackSRC,isShuffle,currTrackList);
         }
-
+        
         currTrackSRC = queue.queue[0].src;
         musicPlayer.src = currTrackSRC;
         musicPlayer.play();
         
         // show copyright button
         toggleExtraPlayBoxButtonsDisplay("show");
-
-        showIndicationOfCurrentlyPlayingAlbum();
+        
         buildSideQueue(sideQueue);      
         
         // currently playing track is highlighted
@@ -566,6 +576,7 @@ export default {
         // play next track by default
         musicPlayer.onended = playNextOrPrev;
         
+        showIndicationOfCurrentlyPlayingAlbum();
       }
 
       /* 
@@ -668,11 +679,14 @@ export default {
        */
       function resetSideQueue(){
         console.log("CHILDREN: "+sideQueue.children().length)
+        
         if(sideQueue.children().length == 2){
-          for(var i = 0; i < 2; i++){
-            sideQueue.children()[0].remove();
-          }
-        }        
+          // for(var i = 0; i < 2; i++){
+          //   sideQueue.children()[0].remove();
+          // }
+          sideQueue.children()[1].remove();
+        }
+        
 
         // close sideQueue
         document.getElementById("sideQueue").checked = false;
@@ -695,7 +709,8 @@ export default {
         ul.attr("class","listView");
 
         // menu toggle button for the sideQueue
-        sideQueue.append('<label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>');
+        //$(".sideQueue").append('<label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>')
+        //sideQueue.append('<label class="menu-toggle" for="sideQueue"><span>Toggle</span></label>');
 
         for(var i=0; i<queue.queue.length; i++){
             
@@ -714,6 +729,7 @@ export default {
         }
 
         sideQueue.append(ul);
+        //alert("Building side queue")
       }
      
       /*
@@ -792,6 +808,9 @@ export default {
  top: 0; 
 }
 
+li{
+  list-style-type: none;
+}
 .tracks{
     max-width: 100%;
     max-height: 45px;
@@ -800,9 +819,22 @@ export default {
     color: white;
     text-overflow: clip;
 }
+.albumMenuItem{
+    max-width: 100%;
+    max-height: 45px;
+    background-color: black;
+    font-size: 25px;
+    color: white;
+    text-overflow: clip;
+}
+.albumMenuItem:hover{
+    cursor:pointer;
+    background-color: rgb(23, 23, 23);
+}
 .tracks:hover{
     opacity: 0.9;
     background-color: rgb(34, 34, 34);
+    cursor:pointer;
 }
 .trackPlaying{
     background-color: rgba(218, 174, 242, 0.301);
