@@ -29,6 +29,7 @@ import Papa from 'papaparse';
 import { storage } from "@/firebase/firebase"
 import {ref,listAll,getDownloadURL,getMetadata} from "firebase/storage"
 import "firebase/storage"
+import vinylGif from "@/assets/vinyl.gif"
 
 export default {
   name: 'MainPageView',
@@ -359,7 +360,7 @@ export default {
               
               albumListMenuItems[j].classList.add("albumPlaying");
               //albumVinyl.setAttribute("src","src/assets/vinyl.gif"); 
-              albumVinyl.src = "src/assets/vinyl.gif";
+              albumVinyl.src = vinylGif;
 
               //albumVinyl.setAttribute("src",require("../assets/vinyl.gif"));
             }      
