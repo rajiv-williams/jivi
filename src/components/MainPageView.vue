@@ -350,7 +350,7 @@ export default {
             if(albumListMenuItems[j].classList.contains("albumPlaying") && albumVinyl!=null){
 
               albumListMenuItems[j].classList.remove("albumPlaying");
-              albumVinyl.setAttribute("src","");
+              albumVinyl.src = "";
               
             }
             //alert(albumListMenuItems[j].innerText == albumList[queue.albumIndex] && albumVinyl!=null);
@@ -358,7 +358,8 @@ export default {
             if(albumListMenuItems[j].innerText == albumList[queue.albumIndex] && albumVinyl!=null){
               
               albumListMenuItems[j].classList.add("albumPlaying");
-              albumVinyl.setAttribute("src","src/assets/vinyl.gif"); 
+              //albumVinyl.setAttribute("src","src/assets/vinyl.gif"); 
+              albumVinyl.src = "src/assets/vinyl.gif";
 
               //albumVinyl.setAttribute("src",require("../assets/vinyl.gif"));
             }      
