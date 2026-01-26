@@ -32,7 +32,7 @@
                     <li>
                       <div class="socialMenuItem">
                         <img class="socialLogo" id="youtubeLogo" src="../assets/YT.png" alt="YouTube">
-                        <a href="https://www.youtube.com/@producerraw7497">PRODUCER RAW</a>
+                        <a href="https://www.youtube.com/@produceraw">PRODUCER RAW</a>
                       </div>
                     </li>
                     <li>
