@@ -19,7 +19,7 @@
     "@vue/compiler-sfc": "^3.5.42",
     "bl": "^6.0.16",
     "csv-parse": "^5.4.0",
-    "eslint": "^9.39.5",
+    "eslint": "^10.9.1",
     "expose-loader": "^5.0.0",
     "firebase": "^11.0.2",
     "fs": "^0.0.1-security",
@@ -46,11 +46,11 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.12",
-    "@vitejs/plugin-vue": "^6.0.0",
-    "eslint-plugin-vue": "^9.31.0",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "eslint-plugin-vue": "^9.33.0",
     "papaparse": "^5.4.1",
     "sass": "^1.89.2",
-    "vite": "^7.3.6",
+    "vite": "^8.2.2",
     "webpack": "^5.96.1"
   },
   "eslintConfig": {
@@ -98,7 +98,7 @@
     "copy-webpack-plugin": {
       "serialize-javascript": "6.0.2"
     },
-    "postcss": "8.4.49",
+    "postcss": "8.5.28",
     "css-select": {
       "nth-check": "2.1.1"
     },
